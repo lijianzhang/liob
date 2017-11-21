@@ -1,6 +1,15 @@
 {
     "presets": [
-        ["env", {"modules": false}],
+        [
+            "env",
+            {
+                "modules": false,
+                "targets": {
+                    "chrome": 49
+                },
+                "useBuiltIns": true
+            }
+        ],
         "stage-0"
     ]
 }
