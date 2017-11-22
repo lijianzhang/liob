@@ -75,7 +75,9 @@ export default function decorativeObservable(target) {
         return new Proxy(target, {
             construct(Cls, argumentsList) {
                 const ob = new Cls(argumentsList);
-                return toObservable(ob);
+                const proxy = toObservable(ob);
+                ob.$proxy = proxy;
+                return proxy;
             },
         });
     }
