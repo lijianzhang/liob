@@ -10,6 +10,8 @@ class Liob {
 
   funcToAction = new WeakMap();
 
+  computeds = new WeakSet();
+
   /**
      * 当前需要触发的观察者函数会在栈至0的时候执行
      */

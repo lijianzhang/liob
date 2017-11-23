@@ -1,7 +1,7 @@
 import liob from './liob';
-import { isFunction, isPrimitive } from './utils';
+import { isFunction, isPrimitive, isComputed } from './utils';
 import { runAction } from './action';
-
+import computed from './computed';
 /**
  * 设计流程:
  * observable 函数传入一个待观察的对象, 对改对象进行Proxy的封装
@@ -9,7 +9,6 @@ import { runAction } from './action';
  * get: 当处于observer执行的时候对
  *
  */
-
 
 function onGetWithFuc(fn, self) {
     if (liob.funcToAction.has(fn)) {
@@ -21,6 +20,14 @@ function onGetWithFuc(fn, self) {
 }
 
 function onGet(target, key, receiver) {
+    const descriptor = isComputed(target, key);
+    if (descriptor && !liob.computeds.has(descriptor)) {
+        const computedDescriptor = computed(target, key, descriptor);
+        Reflect.defineProperty(target, key, computedDescriptor);
+        liob.computeds.add(computedDescriptor);
+        return Reflect.get(target, key, receiver);
+    }
+
     let value = Reflect.get(target, key, receiver);
     if (isFunction(value)) {
         if (Array.isArray(target)) return value;

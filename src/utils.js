@@ -27,3 +27,11 @@ export function isPrimitive(value) {
 
     return false;
 }
+
+export function isComputed(target, key) {
+    const descriptor = Reflect.getOwnPropertyDescriptor(target, key);
+    if (descriptor.get) {
+        return descriptor;
+    }
+    return false;
+}
