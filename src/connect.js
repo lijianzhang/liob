@@ -19,7 +19,7 @@ function reactiveRender() {
 function initRender() {
     this.$observer = new Observer(() => {
         this[isReCollectDepsKey] = true;
-        if (this[willRender]) this.forceUpdate();
+        if (!this[willRender]) this.forceUpdate();
     }, this.name || this.displayName || this.constructor.name);
 
     const res = this.$observer.collectDeps(this[baseRenderKey].bind(this));
