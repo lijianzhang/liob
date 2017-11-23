@@ -1,4 +1,3 @@
-
 /**
  * 是否是方法
  * @param {any} fn
@@ -16,12 +15,7 @@ export function isPrimitive(value) {
         return true;
     }
 
-    if (
-        typeof value === 'string' ||
-    typeof value === 'number' ||
-    typeof value === 'boolean' ||
-    value instanceof Date
-    ) {
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || value instanceof Date) {
         return true;
     }
 
@@ -30,7 +24,7 @@ export function isPrimitive(value) {
 
 export function isComputed(target, key) {
     const descriptor = Reflect.getOwnPropertyDescriptor(target, key);
-    if (descriptor.get) {
+    if (descriptor && descriptor.get) {
         return descriptor;
     }
     return false;
