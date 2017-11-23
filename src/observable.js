@@ -22,12 +22,13 @@ function onGetWithFuc(fn, self) {
 function onGet(target, key, receiver) {
     const descriptor = isComputed(target, key);
     if (descriptor && !liob.computeds.has(descriptor)) {
-        const computedDescriptor = computed(target, key, descriptor);
-        Reflect.defineProperty(target, key, computedDescriptor);
-        liob.computeds.add(computedDescriptor);
-        return Reflect.get(target, key, receiver);
+        if (!Array.isArray(target)) {
+            const computedDescriptor = computed(target, key, descriptor);
+            Reflect.defineProperty(target, key, computedDescriptor);
+            liob.computeds.add(computedDescriptor);
+            return Reflect.get(target, key, receiver);
+        }
     }
-
     let value = Reflect.get(target, key, receiver);
     if (isFunction(value) && Reflect.get(target, 'isRootDataSource', receiver)) {
         return onGetWithFuc(value, liob.dataToProxy.get(target));
