@@ -13,7 +13,7 @@ function reactiveRender() {
         this[isReCollectDepsKey] = false;
         return res;
     }
-    return this.baseRender();
+    return this[baseRenderKey]();
 }
 
 function initRender() {
