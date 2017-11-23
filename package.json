@@ -1,6 +1,6 @@
 {
   "name": "liob",
-  "version": "0.0.28",
+  "version": "0.0.29",
   "description": "响应式的数据管理库",
   "main": "lib/index.js",
   "scripts": {
