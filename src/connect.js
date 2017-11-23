@@ -14,7 +14,7 @@ function reactiveRender() {
 function initRender() {
     this.observer = new Observer(() => {
         this.isReCollectDeps = true;
-        this.forceUpdate();
+        if (this.didMount) this.forceUpdate();
     }, this.name || this.displayName || this.constructor.name);
 
     const res = this.observer.collectDeps(this.baseRender.bind(this));
@@ -29,10 +29,11 @@ const reactiveMixin = {
             this.preObserver = liob.currentObserver;
         }
         this.baseRender = this.render;
-        this.render = initRender.call(this);
+        this.render = initRender.bind(this);
     },
 
     componentDidMount() {
+        this.didMount = true;
         if (this.preObserver) {
             liob.currentObserver = this.preObserver;
             this.preObserver = null;
