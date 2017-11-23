@@ -8,7 +8,7 @@ function reactiveRender() {
         this.isReCollectDeps = false;
         return res;
     }
-    return this.baseRender.call(this);
+    return this.baseRender();
 }
 
 function initRender() {
