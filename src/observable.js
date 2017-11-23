@@ -33,7 +33,6 @@ function onGet(target, key, receiver) {
 
     let value = Reflect.get(target, key, receiver);
     if (isFunction(value) && target[isRootDataSource]) {
-        event.emit('action', `${target.constructor.name}.${key}`);
         return onGetWithFuc(value, liob.dataToProxy.get(target));
     } else if (liob.inAction) {
         return liob.dataToProxy.get(value) || value;
