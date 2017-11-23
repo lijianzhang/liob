@@ -8,7 +8,7 @@ class Liob {
   dataToProxy = new WeakMap(); // 弱引用
   proxys = new WeakSet();
 
-  funcToAction = new WeakMap();
+  actions = new WeakSet();
 
   computeds = new WeakSet();
 

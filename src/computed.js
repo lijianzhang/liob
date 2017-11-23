@@ -18,7 +18,6 @@ export default function computed(target, key, descriptor) {
             newGet = newGet.bind(this);
             observer = new Obersver(() => {
                 isShouldUpdate = true;
-                event.emit('computed: ', `${target.constructor.name}.${key}`);
                 liob.pushQueue(observers);
                 observers.clear();
             }, `${target.constructor.name}.${key}`);
@@ -26,6 +25,7 @@ export default function computed(target, key, descriptor) {
             isShouldUpdate = false;
             isFisrt = false;
         } else if (isShouldUpdate) {
+            event.emit('computed', `${target.constructor.name}->get${key}()`);
             preValue = observer.collectDeps(newGet);
             isShouldUpdate = false;
         }

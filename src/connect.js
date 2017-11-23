@@ -22,7 +22,7 @@ function initRender() {
         this[isReCollectDepsKey] = true;
         if (!this[willRender]) {
             this.forceUpdate();
-            event.emit('component:reaction', this.constructor.name);
+            event.emit('component:Observer', this.constructor.name);
         }
     }, this.constructor.name);
 
