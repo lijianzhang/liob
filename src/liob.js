@@ -92,7 +92,6 @@ class Liob {
       });
       if (!this.inAction && !this.readyRunQueue) {
           Promise.resolve().then(this.runQueue);
-          this.readyRunQueue = true;
       }
   }
 

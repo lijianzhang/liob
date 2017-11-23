@@ -4,7 +4,7 @@ import liob from './liob';
 const baseRenderKey = Symbol('baseRender');
 const isReCollectDepsKey = Symbol('isReCollectDeps');
 const preObserverKey = Symbol('preObserver');
-const didMountKey = Symbol('didMount');
+const willRender = Symbol('willRender');
 
 function reactiveRender() {
     if (this[isReCollectDepsKey]) {
@@ -18,8 +18,8 @@ function reactiveRender() {
 
 function initRender() {
     this.$observer = new Observer(() => {
-        this.isReCollectDeps = true;
-        if (this[didMountKey]) this.forceUpdate();
+        this[isReCollectDepsKey] = true;
+        if (this[willRender]) this.forceUpdate();
     }, this.name || this.displayName || this.constructor.name);
 
     const res = this.$observer.collectDeps(this[baseRenderKey].bind(this));
@@ -35,10 +35,11 @@ const reactiveMixin = {
         }
         this[baseRenderKey] = this.render;
         this.render = initRender;
+        this[willRender] = true;
     },
 
     componentDidMount() {
-        this[didMountKey] = true;
+        this[willRender] = false;
         if (this[preObserverKey]) {
             liob.currentObserver = this[preObserverKey];
             this[preObserverKey] = null;
@@ -47,6 +48,13 @@ const reactiveMixin = {
         }
     },
 
+    componentWillUpdate() {
+        this[willRender] = true;
+    },
+
+    componentDidUpdate() {
+        this[willRender] = false;
+    },
     componentWillUnmount() {
         this.$observer.unSubscribe();
         this.$observer = null;
@@ -75,6 +83,8 @@ function patch(target, funcName, runMixinFirst = false) {
 export default function connect(target) {
     patch(target.prototype, 'componentWillMount', true);
     patch(target.prototype, 'componentDidMount');
+    patch(target.prototype, 'componentWillUpdate', true);
+    patch(target.prototype, 'componentDidUpdate', true);
     patch(target.prototype, 'componentWillUnmount');
 
     return target;
