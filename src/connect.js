@@ -1,96 +1,95 @@
 import Observer from './observer';
 import liob from './liob';
 
-export default function connect(Target) {
-    return class extends Target {
-        isReCollectDeps = false;
+function reactiveRender() {
+    if (this.isReCollectDeps) {
+        const res = this.observer.collectDeps(this.baseRender.bind(this));
+        liob.currentObserver = this.observer;
+        this.isReCollectDeps = false;
+        return res;
+    }
+    return this.baseRender.call(this);
+}
 
+function initRender() {
+    this.observer = new Observer(() => {
+        this.isReCollectDeps = true;
+        this.forceUpdate();
+    }, this.name || this.displayName || this.constructor.name);
 
-        componentWillMount() {
+    const res = this.observer.collectDeps(this.baseRender.bind(this));
+    liob.currentObserver = this.observer;
+    this.render = reactiveRender.bind(this);
+    return res;
+}
+
+const reactiveMixin = {
+    componentWillMount() {
+        if (liob.currentObserver) {
+            this.preObserver = liob.currentObserver;
+        }
+        this.baseRender = this.render;
+        this.render = initRender.call(this);
+    },
+
+    componentDidMount() {
+        if (this.preObserver) {
+            liob.currentObserver = this.preObserver;
+            this.preObserver = null;
+        } else {
+            liob.currentObserver = null;
+        }
+    },
+
+    componentWillUpdate() {
+        if (this.isReCollectDeps) {
             if (liob.currentObserver) {
                 this.preObserver = liob.currentObserver;
             }
-            if (super.componentWillMount) super.componentWillMount();
-        }
-
-
-        componentDidMount() {
-            if (this.preObserver) {
-                liob.currentObserver = this.preObserver;
-                this.preObserver = null;
-            } else {
-                liob.currentObserver = null;
-            }
-            if (super.componentDidMount) super.componentDidMount();
-        }
-
-
-        componentWillUpdate(nextProps, nextState) {
-            if (this.isReCollectDeps) {
-                if (liob.currentObserver) {
-                    this.preObserver = liob.currentObserver;
-                }
-                liob.currentObserver = this.observer;
-            }
-
-
-            if (super.componentWillUpdate) {
-                super.componentWillUpdate(nextProps, nextState);
-            }
-        }
-
-        componentDidUpdate(prevProps, prevState) {
-            if (this.preObserver) {
-                liob.currentObserver = this.preObserver;
-                this.preObserver = null;
-            } else {
-                liob.currentObserver = null;
-            }
-
-            if (super.componentDidUpdate) {
-                super.componentDidUpdate(prevProps, prevState);
-            }
-        }
-
-        componentWillUnmount() {
-            if (super.componentWillUnmount) {
-                super.componentWillUnmount();
-            }
-
-            this.observer.unSubscribe();
-            this.observer = null;
-        }
-
-
-        initRender() {
-            this.observer = new Observer(() => {
-                this.isReCollectDeps = true;
-                this.forceUpdate();
-            }, this.name || this.displayName || Target.name);
-
-            const res = this.observer.collectDeps(this.supRender.bind(this));
             liob.currentObserver = this.observer;
-            console.log('end collectDeps');
-            this.render = this.reactiveRender;
-            return res;
         }
+    },
 
-        reactiveRender() {
-            if (this.isReCollectDeps) {
-                const res = this.observer.collectDeps(this.supRender.bind(this));
-                liob.currentObserver = this.observer;
-                console.log('end collectDeps');
-                this.isReCollectDeps = false;
-                return res;
-            }
-            return this.supRender.call(this);
+    componentDidUpdate() {
+        if (this.preObserver) {
+            liob.currentObserver = this.preObserver;
+            this.preObserver = null;
+        } else {
+            liob.currentObserver = null;
         }
+    },
 
-        render() {
-            this.supRender = super.render;
+    componentWillUnmount() {
+        this.observer.unSubscribe();
+        this.observer = null;
+    },
+};
 
+function patch(target, funcName, runMixinFirst = false) {
+    const base = target[funcName];
+    const mixinFunc = reactiveMixin[funcName];
+    if (!base) {
+        target[funcName] = mixinFunc;
+    } else {
+        target[funcName] =
+            runMixinFirst === true
+                ? function funcName(...args: any[]) {
+                    mixinFunc.apply(this, args);
+                    base.apply(this, args);
+                }
+                : function funcName(...args: any[]) {
+                    base.apply(this, args);
+                    mixinFunc.apply(this, args);
+                };
+    }
+}
 
-            return this.initRender();
-        }
-    };
+export default function connect(target) {
+    patch(target.prototype, 'componentWillMount', true);
+    patch(target.prototype, 'componentDidMount');
+    patch(target.prototype, 'componentWillUpdate', true);
+    patch(target.prototype, 'componentDidUpdate');
+    patch(target.prototype, 'componentWillUnmount');
+
+    return target;
 }
