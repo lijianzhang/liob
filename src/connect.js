@@ -8,7 +8,7 @@ const didMountKey = Symbol('didMount');
 
 function reactiveRender() {
     if (this[isReCollectDepsKey]) {
-        const res = this.$observer.collectDeps(this.baseRender.bind(this));
+        const res = this.$observer.collectDeps(this[baseRenderKey].bind(this));
         liob.currentObserver = this.$observer;
         this[isReCollectDepsKey] = false;
         return res;
@@ -22,7 +22,7 @@ function initRender() {
         if (this[didMountKey]) this.forceUpdate();
     }, this.name || this.displayName || this.constructor.name);
 
-    const res = this.$observer.collectDeps(this.baseRender.bind(this));
+    const res = this.$observer.collectDeps(this[baseRenderKey].bind(this));
     liob.currentObserver = this.$observer;
     this.render = reactiveRender;
     return res;
@@ -40,7 +40,7 @@ const reactiveMixin = {
     componentDidMount() {
         this[didMountKey] = true;
         if (this[preObserverKey]) {
-            liob.currentObserver = this.preObserver;
+            liob.currentObserver = this[preObserverKey];
             this[preObserverKey] = null;
         } else {
             liob.currentObserver = null;
