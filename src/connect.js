@@ -1,5 +1,6 @@
 import Observer from './observer';
 import liob from './liob';
+import event from './event';
 
 const baseRenderKey = Symbol('baseRender');
 const isReCollectDepsKey = Symbol('isReCollectDeps');
@@ -17,10 +18,14 @@ function reactiveRender() {
 }
 
 function initRender() {
+    const name = this.name || this.displayName || this.constructor.name;
     this.$observer = new Observer(() => {
         this[isReCollectDepsKey] = true;
-        if (!this[willRender]) this.forceUpdate();
-    }, this.name || this.displayName || this.constructor.name);
+        if (!this[willRender]) {
+            this.forceUpdate();
+            event.emit('component:reaction', name);
+        }
+    }, name);
 
     const res = this.$observer.collectDeps(this[baseRenderKey].bind(this));
     liob.currentObserver = this.$observer;

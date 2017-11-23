@@ -2,6 +2,7 @@ import liob from './liob';
 import { isFunction, isPrimitive, isComputed } from './utils';
 import { runAction } from './action';
 import computed from './computed';
+import event from './event';
 /**
  * 设计流程:
  * observable 函数传入一个待观察的对象, 对改对象进行Proxy的封装
@@ -31,6 +32,7 @@ function onGet(target, key, receiver) {
     let value = Reflect.get(target, key, receiver);
     if (isFunction(value)) {
         if (Array.isArray(target)) return value;
+        event.emit('action', `${target}.${key}`);
         return onGetWithFuc(value, liob.dataToProxy.get(target));
     } else if (liob.inAction) {
         return liob.dataToProxy.get(value) || value;

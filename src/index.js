@@ -9,3 +9,5 @@ export { default as action } from './action';
 export { default as liob } from './liob';
 
 export { default as computed } from './computed';
+
+export { default as useLog } from './log';
