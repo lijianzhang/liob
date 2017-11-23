@@ -74,11 +74,11 @@ function patch(target, funcName, runMixinFirst = false) {
     } else {
         target[funcName] =
             runMixinFirst === true
-                ? function funcName(...args: any[]) {
+                ? function funcName(...args) {
                     mixinFunc.apply(this, args);
                     base.apply(this, args);
                 }
-                : function funcName(...args: any[]) {
+                : function funcName(...args) {
                     base.apply(this, args);
                     mixinFunc.apply(this, args);
                 };
