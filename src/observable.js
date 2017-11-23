@@ -3,6 +3,8 @@ import { isFunction, isPrimitive, isComputed } from './utils';
 import { runAction } from './action';
 import computed from './computed';
 import event from './event';
+
+const isRootDataSource = Symbol('isRootDataSource');
 /**
  * 设计流程:
  * observable 函数传入一个待观察的对象, 对改对象进行Proxy的封装
@@ -30,8 +32,7 @@ function onGet(target, key, receiver) {
     }
 
     let value = Reflect.get(target, key, receiver);
-    if (isFunction(value)) {
-        if (Array.isArray(target)) return value;
+    if (isFunction(value) && target[isRootDataSource]) {
         event.emit('action', `${target}.${key}`);
         return onGetWithFuc(value, liob.dataToProxy.get(target));
     } else if (liob.inAction) {
@@ -84,6 +85,7 @@ export default function decorativeObservable(target) {
         return new Proxy(target, {
             construct(Cls, argumentsList) {
                 const ob = new Cls(argumentsList);
+                ob[isRootDataSource] = true;
                 const proxy = toObservable(ob);
                 ob.$proxy = proxy;
                 return proxy;

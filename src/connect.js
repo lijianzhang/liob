@@ -18,14 +18,13 @@ function reactiveRender() {
 }
 
 function initRender() {
-    const name = this.name || this.displayName || this.constructor.name;
     this.$observer = new Observer(() => {
         this[isReCollectDepsKey] = true;
         if (!this[willRender]) {
             this.forceUpdate();
-            event.emit('component:reaction', name);
+            event.emit('component:reaction', this.constructor.name);
         }
-    }, name);
+    }, this.constructor.name);
 
     const res = this.$observer.collectDeps(this[baseRenderKey].bind(this));
     liob.currentObserver = this.$observer;
