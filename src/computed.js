@@ -1,6 +1,5 @@
 import Obersver from './observer';
 import liob from './liob';
-import event from './event';
 
 export default function computed(target, key, descriptor) {
     let newGet = descriptor.get;
@@ -25,7 +24,6 @@ export default function computed(target, key, descriptor) {
             isShouldUpdate = false;
             isFisrt = false;
         } else if (isShouldUpdate) {
-            event.emit('computed', `${target.constructor.name}->get${key}()`);
             preValue = observer.collectDeps(newGet);
             isShouldUpdate = false;
         }

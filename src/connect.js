@@ -22,9 +22,8 @@ function initRender() {
         this[isReCollectDepsKey] = true;
         if (!this[willRender]) {
             this.forceUpdate();
-            event.emit('component:Observer', this.constructor.name);
         }
-    }, this.constructor.name);
+    }, `${this.constructor.name}.render()`);
 
     const res = this.$observer.collectDeps(this[baseRenderKey].bind(this));
     liob.currentObserver = this.$observer;
@@ -54,10 +53,22 @@ const reactiveMixin = {
 
     componentWillUpdate() {
         this[willRender] = true;
+        if (this[isReCollectDepsKey]) {
+            if (liob.currentObserver) {
+                this[preObserverKey] = liob.currentObserver;
+            }
+            liob.currentObserver = this.$observer;
+        }
     },
 
     componentDidUpdate() {
         this[willRender] = false;
+        if (this[preObserverKey]) {
+            liob.currentObserver = this[preObserverKey];
+            this[preObserverKey] = null;
+        } else {
+            liob.currentObserver = null;
+        }
     },
     componentWillUnmount() {
         this.$observer.unSubscribe();

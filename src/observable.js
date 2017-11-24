@@ -1,5 +1,6 @@
 import liob from './liob';
 import { isFunction, isPrimitive } from './utils';
+import event from './event';
 /**
  * 设计流程:
  * observable 函数传入一个待观察的对象, 对改对象进行Proxy的封装
@@ -30,7 +31,9 @@ function onSet(target, key, value, receiver) {
     const oldValue = Reflect.get(target, key, receiver);
     if (oldValue === value && !Array.isArray(target)) return true;
     Reflect.set(target, key, value, receiver);
-
+    event.emit('set', {
+        target, key, oldValue, value,
+    });
     const observers = liob.getObservers(target, key);
     liob.pushQueue(observers);
     return true;

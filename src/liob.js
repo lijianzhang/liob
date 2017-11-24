@@ -1,3 +1,4 @@
+import event from './event';
 /**
  * 全局的数据源管理
  */
@@ -7,10 +8,6 @@ class Liob {
      */
   dataToProxy = new WeakMap(); // 弱引用
   proxys = new WeakSet();
-
-  actions = new WeakSet();
-
-  computeds = new WeakSet();
 
   /**
      * 当前需要触发的观察者函数会在栈至0的时候执行
@@ -99,6 +96,7 @@ class Liob {
       this.readyRunQueue = false;
       if (this.queue.size === 0) return;
       this.queue.forEach((observer) => {
+          event.emit('Observer', observer.name);
           observer.run();
       });
 

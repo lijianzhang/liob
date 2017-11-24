@@ -9,12 +9,14 @@ export default function useLog() {
         console.groupEnd();
     });
 
-    event.on('component:Observer', (name) => {
-        console.log('%c %s %c %s.render', 'color: #4CAF50;', 'Observer: ', 'color: #666', name);
+    event.on('Observer', (name) => {
+        console.log('%c %s %c %s', 'color: #666;', 'Observer: ', 'color: #666', name);
     });
 
-    event.on('computed', (name) => {
-        console.log('%c %s %c %s', 'color: #4CAF50;', 'recount: ', 'color: #666', name);
+    event.on('set', ({
+        target, key, oldValue, value,
+    }) => {
+        console.log('%c set: %o %c %s oldValue %o => %c newValue %o', 'color: #ff4a4e;', target, 'color: #666', key, oldValue, 'color: #03A9F4;', value); //eslint-disable-line
     });
 }
 
