@@ -66,7 +66,11 @@ export default function decorativeObservable(target) {
             construct(Cls, argumentsList) {
                 const ob = new Cls(...argumentsList);
                 const proxy = toObservable(ob);
-                ob.$proxy = proxy;
+                Reflect.defineProperty(ob, '$proxy', {
+                    value: proxy,
+                    writable: false,
+                    enumerable: false,
+                });
                 return proxy;
             },
         });
