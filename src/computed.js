@@ -1,40 +1,48 @@
 import Obersver from './observer';
 import liob from './liob';
+import { debug } from 'util';
 
 export default function computed(target, key, descriptor) {
-    function initGet() {
-        let newGet = descriptor.get;
-        let isShouldUpdate;
-        let preValue;
-        let observer = null;
-        const observers = new Set();
+    const computedKey = Symbol(key);
 
-        return function get() {
-            if (liob.currentObserver) {
-                observers.add(liob.currentObserver);
-                liob.currentObserver.bindObservers.add(observers);
-            }
-            if (!observer) {
-                newGet = newGet.bind(this);
-                observer = new Obersver(() => {
-                    isShouldUpdate = true;
-                    if (observers.size === 0) {
-                        observer.unSubscribe();
-                        observer = null;
-                    } else {
-                        liob.pushQueue(observers);
-                    }
-                }, `${target.constructor.name}.${key}`);
-                preValue = observer.collectDeps(newGet);
-                isShouldUpdate = false;
-            } else if (isShouldUpdate) {
-                preValue = observer.collectDeps(newGet);
-                isShouldUpdate = false;
-            }
-            return preValue;
-        };
+    const newGet = descriptor.get;
+
+    function get() {
+        if (!this.$raw[computedKey]) {
+            this.$raw[computedKey] = {
+                observers: new Set(),
+                preValue: null,
+                newGet: newGet.bind(this),
+                observer: null,
+                isShouldUpdate: false,
+            };
+        }
+        const obj = this.$raw[computedKey];
+
+        if (liob.currentObserver) {
+            obj.observers.add(liob.currentObserver);
+            liob.currentObserver.bindObservers.add(obj.observers);
+        }
+        if (!obj.observer) {
+            obj.observer = new Obersver(() => {
+                obj.isShouldUpdate = true;
+                if (obj.observers.size === 0) {
+                    obj.observer.unSubscribe();
+                    obj.observer = null;
+                } else {
+                    liob.pushQueue(obj.observers);
+                }
+            }, `${target.constructor.name}.${key}`);
+
+            obj.preValue = obj.observer.collectDeps(obj.newGet);
+            obj.isShouldUpdate = false;
+        } else if (obj.isShouldUpdate) {
+            obj.preValue = obj.observer.collectDeps(obj.newGet);
+            obj.isShouldUpdate = false;
+        }
+        return obj.preValue;
     }
 
-    descriptor.get = initGet();
+    descriptor.get = get;
     return descriptor;
 }

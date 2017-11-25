@@ -10,6 +10,7 @@ import event from './event';
  */
 
 function onGet(target, key, receiver) {
+    if (key === '$raw') return target;
     let value = Reflect.get(target, key, receiver);
     if (!liob.currentObserver) {
         return liob.dataToProxy.get(value) || value;
