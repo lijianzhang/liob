@@ -1,6 +1,5 @@
 import Observer from './observer';
 import liob from './liob';
-import event from './event';
 
 const baseRenderKey = Symbol('baseRender');
 const isReCollectDepsKey = Symbol('isReCollectDeps');
@@ -19,8 +18,8 @@ function reactiveRender() {
 
 function initRender() {
     this.$observer = new Observer(() => {
-        this[isReCollectDepsKey] = true;
-        if (!this[willRender]) {
+        if (!this[willRender] && !this[isReCollectDepsKey]) {
+            this[isReCollectDepsKey] = true;
             this.forceUpdate();
         }
     }, `${this.constructor.name}.render()`);

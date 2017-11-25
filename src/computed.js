@@ -2,35 +2,39 @@ import Obersver from './observer';
 import liob from './liob';
 
 export default function computed(target, key, descriptor) {
-    let newGet = descriptor.get;
-    let isShouldUpdate;
-    let preValue;
-    let observer;
-    let isFisrt = true;
-    const observers = new Set();
-
     function initGet() {
-        if (liob.currentObserver) {
-            observers.add(liob.currentObserver);
-        }
-        if (isFisrt) {
-            newGet = newGet.bind(this);
-            observer = new Obersver(() => {
-                isShouldUpdate = true;
-                liob.pushQueue(observers);
-                observers.clear();
-            }, `${target.constructor.name}.${key}`);
-            preValue = observer.collectDeps(newGet);
-            isShouldUpdate = false;
-            isFisrt = false;
-        } else if (isShouldUpdate) {
-            preValue = observer.collectDeps(newGet);
-            isShouldUpdate = false;
-        }
+        let newGet = descriptor.get;
+        let isShouldUpdate;
+        let preValue;
+        let observer = null;
+        const observers = new Set();
 
-        return preValue;
+        return function get() {
+            if (liob.currentObserver) {
+                observers.add(liob.currentObserver);
+                liob.currentObserver.bindObservers.add(observers);
+            }
+            if (!observer) {
+                newGet = newGet.bind(this);
+                observer = new Obersver(() => {
+                    isShouldUpdate = true;
+                    if (observers.size === 0) {
+                        observer.unSubscribe();
+                        observer = null;
+                    } else {
+                        liob.pushQueue(observers);
+                    }
+                }, `${target.constructor.name}.${key}`);
+                preValue = observer.collectDeps(newGet);
+                isShouldUpdate = false;
+            } else if (isShouldUpdate) {
+                preValue = observer.collectDeps(newGet);
+                isShouldUpdate = false;
+            }
+            return preValue;
+        };
     }
 
-    descriptor.get = initGet;
+    descriptor.get = initGet();
     return descriptor;
 }

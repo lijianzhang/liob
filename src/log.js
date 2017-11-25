@@ -3,10 +3,12 @@ import event from './event';
 
 export default function useLog() {
     event.on('action', (name) => {
+        console.time(name);
         console.group('%c %s %c %s', 'color: #03A9F4;', 'action', 'color: #666', name);
     });
 
-    event.on('endAction', () => {
+    event.on('endAction', (name) => {
+        console.timeEnd(name);
         console.groupEnd();
     });
 

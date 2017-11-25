@@ -53,10 +53,10 @@ class Liob {
           keyToObservers.set(key, observers);
       }
 
-      if (Array.isArray(Reflect.get(raw, key))) {
-      const subObservers = this.getObservers(Reflect.get(raw, key), 'length'); //eslint-disable-line
-          observers.forEach(observer => subObservers.add(observer));
-      }
+      //   if (Array.isArray(Reflect.get(raw, key))) {
+      //   const subObservers = this.getObservers(Reflect.get(raw, key), 'length'); //eslint-disable-line
+      //       observers.forEach(observer => subObservers.add(observer));
+      //   }
 
       return observers;
   }
@@ -82,13 +82,12 @@ class Liob {
      */
   pushQueue(observers) {
       observers.forEach((observer) => {
-          if (this.queue.has(observer)) {
-              this.queue.delete(observer);
-          }
+          this.queue.delete(observer);
           this.queue.add(observer);
       });
       if (!this.inAction && !this.readyRunQueue) {
           Promise.resolve().then(this.runQueue);
+          this.readyRunQueue = true;
       }
   }
 

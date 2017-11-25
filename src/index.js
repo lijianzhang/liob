@@ -2,7 +2,7 @@ export { default as observable } from './observable';
 
 export { default as connect } from './connect';
 
-export { default as Observer } from './observer';
+export { default as Observer, observe } from './observer';
 
 export { default as action } from './action';
 

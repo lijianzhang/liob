@@ -11,25 +11,24 @@ import event from './event';
 
 function onGet(target, key, receiver) {
     let value = Reflect.get(target, key, receiver);
-    if (isFunction(value)) {
-        return value;
-    } else if (liob.inAction) {
+    if (!liob.currentObserver) {
         return liob.dataToProxy.get(value) || value;
+    } else if (isFunction(value)) {
+        return value;
     } else if (!isPrimitive(value)) {
         value = toObservable(value); //eslint-disable-line
     }
-    if (liob.currentObserver) {
-        const observers = liob.getObservers(target, key);
-        observers.add(liob.currentObserver);
-        liob.currentObserver.bindObservers.add(observers);
-    }
+    const observers = liob.getObservers(target, key);
+    observers.add(liob.currentObserver);
+    liob.currentObserver.bindObservers.add(observers);
+
 
     return value;
 }
 
 function onSet(target, key, value, receiver) {
     const oldValue = Reflect.get(target, key, receiver);
-    if (oldValue === value && !Array.isArray(target)) return true;
+    if (oldValue === value && key !== 'length') return true;
     Reflect.set(target, key, value, receiver);
     event.emit('set', {
         target, key, oldValue, value,
@@ -64,7 +63,7 @@ export default function decorativeObservable(target) {
     if (isFunction(target)) {
         return new Proxy(target, {
             construct(Cls, argumentsList) {
-                const ob = new Cls(argumentsList);
+                const ob = new Cls(...argumentsList);
                 const proxy = toObservable(ob);
                 ob.$proxy = proxy;
                 return proxy;
