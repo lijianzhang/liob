@@ -53,10 +53,10 @@ class Liob {
           keyToObservers.set(key, observers);
       }
 
-      //   if (Array.isArray(Reflect.get(raw, key))) {
-      //   const subObservers = this.getObservers(Reflect.get(raw, key), 'length'); //eslint-disable-line
-      //       observers.forEach(observer => subObservers.add(observer));
-      //   }
+      if (Array.isArray(Reflect.get(raw, key))) {
+        const subObservers = this.getObservers(Reflect.get(raw, key), 'length'); //eslint-disable-line
+          observers.forEach(observer => subObservers.add(observer));
+      }
 
       return observers;
   }
