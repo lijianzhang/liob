@@ -1,6 +1,5 @@
 import Obersver from './observer';
 import liob from './liob';
-import { debug } from 'util';
 
 export default function computed(target, key, descriptor) {
     const computedKey = Symbol(key);
@@ -8,8 +7,9 @@ export default function computed(target, key, descriptor) {
     const newGet = descriptor.get;
 
     function get() {
-        if (!this.$raw[computedKey]) {
-            this.$raw[computedKey] = {
+        const self = this.$raw || this;
+        if (!self[computedKey]) {
+            self[computedKey] = {
                 observers: new Set(),
                 preValue: null,
                 newGet: newGet.bind(this),
@@ -17,7 +17,7 @@ export default function computed(target, key, descriptor) {
                 isShouldUpdate: false,
             };
         }
-        const obj = this.$raw[computedKey];
+        const obj = self[computedKey];
 
         if (liob.currentObserver) {
             obj.observers.add(liob.currentObserver);

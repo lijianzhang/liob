@@ -15,7 +15,7 @@ function onGet(target, key, receiver) {
     if (!liob.currentObserver) {
         return liob.dataToProxy.get(value) || value;
     } else if (isFunction(value)) {
-        return value.bind(this);
+        return value.bind(receiver);
     } else if (!isPrimitive(value)) {
         value = toObservable(value); //eslint-disable-line
     }
