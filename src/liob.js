@@ -1,4 +1,5 @@
 import event from './event';
+import useLog from './log';
 /**
  * 全局的数据源管理
  */
@@ -8,6 +9,8 @@ class Liob {
      */
   dataToProxy = new WeakMap(); // 弱引用
   proxys = new WeakSet();
+
+  useLog = useLog;
 
   /**
      * 当前需要触发的观察者函数会在栈至0的时候执行
