@@ -5,6 +5,7 @@ const baseRenderKey = Symbol('baseRender');
 const isReCollectDepsKey = Symbol('isReCollectDeps');
 const preObserverKey = Symbol('preObserver');
 const willRender = Symbol('willRender');
+const connectKey = Symbol('connect');
 
 function reactiveRender() {
     if (this[isReCollectDepsKey]) {
@@ -95,6 +96,8 @@ function patch(target, funcName, runMixinFirst = false) {
 }
 
 export default function connect(target) {
+    if (target[connectKey]) return target;
+    target[connectKey] = true;
     patch(target.prototype, 'componentWillMount', true);
     patch(target.prototype, 'componentDidMount');
     patch(target.prototype, 'componentWillUpdate', true);
