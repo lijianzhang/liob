@@ -1,26 +1,30 @@
 import Observer from './observer';
+import liob from './liob';
 
 const baseRenderKey = Symbol('baseRender');
 const isReCollectDepsKey = Symbol('isReCollectDeps');
-const willRender = Symbol('willRender');
+const preObserverKey = Symbol('preObserver');
 const connectKey = Symbol('connect');
 
 function reactiveRender() {
-    this[willRender] = true;
     const res = this.$observer.collectDeps(this[baseRenderKey]);
+    liob.currentObserver = this.$observer;
     this[isReCollectDepsKey] = false;
-    this[willRender] = false;
+    if (liob.currentObserver) {
+        this[preObserverKey] = liob.currentObserver;
+    }
+    liob.currentObserver = this.$observer;
     return res;
 }
 
 function initRender() {
     this.$observer = new Observer(() => {
-        if (!this[willRender] && !this[isReCollectDepsKey]) {
+        if (!this[isReCollectDepsKey]) {
             this[isReCollectDepsKey] = true;
             this.forceUpdate();
         }
     }, `${this.constructor.name}.render()`);
-    this[isReCollectDepsKey] = true;
+
     this.render = reactiveRender;
     return reactiveRender.call(this);
 }
@@ -29,6 +33,24 @@ const reactiveMixin = {
     componentWillMount() {
         this[baseRenderKey] = this.render.bind(this);
         this.render = initRender;
+    },
+
+    componentDidMount() {
+        if (this[preObserverKey]) {
+            liob.currentObserver = this[preObserverKey];
+            this[preObserverKey] = null;
+        } else {
+            liob.currentObserver = null;
+        }
+    },
+
+    componentDidUpdate() {
+        if (this[preObserverKey]) {
+            liob.currentObserver = this[preObserverKey];
+            this[preObserverKey] = null;
+        } else {
+            liob.currentObserver = null;
+        }
     },
     componentWillUnmount() {
         this.$observer.unSubscribe();
@@ -42,13 +64,16 @@ function patch(target, funcName, runMixinFirst = false) {
     if (!base) {
         target[funcName] = mixinFunc;
     } else {
-        target[funcName] = runMixinFirst === true ? function funcName(...args) {
-            mixinFunc.apply(this, args);
-            base.apply(this, args);
-        } : function funcName(...args) {
-            base.apply(this, args);
-            mixinFunc.apply(this, args);
-        };
+        target[funcName] =
+            runMixinFirst === true ?
+                function funcName(...args) {
+                    mixinFunc.apply(this, args);
+                    base.apply(this, args);
+                } :
+                function funcName(...args) {
+                    base.apply(this, args);
+                    mixinFunc.apply(this, args);
+                };
     }
 }
 
@@ -56,6 +81,8 @@ export default function connect(target) {
     if (target[connectKey]) return target;
     target[connectKey] = true;
     patch(target.prototype, 'componentWillMount', true);
+    patch(target.prototype, 'componentDidMount');
+    patch(target.prototype, 'componentDidUpdate', true);
     patch(target.prototype, 'componentWillUnmount');
 
     return target;
