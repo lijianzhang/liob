@@ -1,4 +1,4 @@
-import cloneDeep from 'lodash.clonedeep';
+import clone from 'lodash.clone';
 import event from './event';
 
 export default function useLog() {
@@ -19,7 +19,7 @@ export default function useLog() {
     const unSet = event.on('set', ({
         target, key, oldValue, value,
     }) => {
-        console.log('%c set: %o %c %s %c oldValue %o => %c newValue %o', 'color: #ff4a4e;', target, 'color: #009688;', key,'color: #263238;', cloneDeep(oldValue), 'color: #03A9F4;', cloneDeep(value)); //eslint-disable-line
+        console.log('%c set: %o %c %s %c oldValue %o => %c newValue %o', 'color: #ff4a4e;', target, 'color: #009688;', key, 'color: #263238;', clone(oldValue), 'color: #03A9F4;', clone(value)); //eslint-disable-line
     });
 
     return () => {
