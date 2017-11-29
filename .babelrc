@@ -7,11 +7,16 @@
                 "targets": {
                     "chrome": 49
                 },
-                "include": [
-                    "transform-es2015-classes"
-                ]
+                "include": ["transform-es2015-classes"]
             }
         ],
         "stage-0"
-    ]
+    ],
+    "env": {
+        "test": {
+            "presets": ["env", "stage-0"],
+            "plugins": ["transform-decorators-legacy"]
+        }
+    },
+    "plugins": ["transform-decorators-legacy"]
 }

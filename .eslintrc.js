@@ -12,7 +12,7 @@ module.exports = {
         'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
         'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
         'no-shadow': 0,
-        'camelcase': 0,
+        camelcase: 0,
         'jsx-a11y/no-static-element-interactions': 0,
         'react/prop-types': 0,
         'react/no-danger': 0,
@@ -22,13 +22,12 @@ module.exports = {
     },
     env: {
         browser: true,
-        "jest/globals": true,
+        'jest/globals': true,
     },
     globals: {
         module: true,
         process: true,
+        liob: true,
     },
-    "plugins": [
-        "jest"
-    ]
+    plugins: ['jest'],
 };

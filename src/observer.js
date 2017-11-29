@@ -3,8 +3,8 @@ import liob from './liob';
 export default class Observer {
     constructor(callBack, name) {
         /**
-     * 每次依赖被修改的时候都会触发callBack
-     */
+         * 每次依赖被修改的时候都会触发callBack
+         */
         this.callBack = callBack;
         this.name = name;
     }
@@ -36,7 +36,7 @@ export default class Observer {
     }
 
     run() {
-        if (this.callBack) this.callBack(this);
+        this.callBack(this);
     }
 
     unSubscribe() {
@@ -45,8 +45,11 @@ export default class Observer {
     }
 }
 
-export function observe(fn) {
-    return new Observer((observer) => {
+export function observe(fn, name = 'observe') {
+    if (!fn) throw new Error('you need set callBack');
+    const ob = new Observer((observer) => {
         observer.collectDeps(fn);
-    });
+    }, name);
+    ob.run();
+    return ob;
 }

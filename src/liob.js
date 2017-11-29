@@ -116,5 +116,9 @@ if (window) {
     window.liob = liob;
 }
 
+if (global) {
+    global.liob = liob;
+}
+
 
 export default liob;
