@@ -1,5 +1,4 @@
-import observable from '../src/observable';
-import { observe } from '../src/observer';
+import { observe, observable } from '../src';
 import liob from '../src/liob';
 
 /* eslint-disable no-unused-expressions */
@@ -18,7 +17,7 @@ describe('multiple observer test', () => {
         });
     });
 
-    test('Should only run once of observe', () => {
+    test('should only run once of observe', () => {
         let count = 0;
         const obj = observable({ test: 'test', name: null });
         observe(() => {
@@ -29,6 +28,19 @@ describe('multiple observer test', () => {
         obj.test = 'test2';
         Promise.resolve().then(() => {
             expect(count).toEqual(1);
+        });
+    });
+
+    test('should run twice of observe', () => {
+        let count = 0;
+        const obj = observable({ test: 'test', name: null });
+        observe(() => {
+            count += 1;
+            obj.name; //eslint-disable-line
+        });
+        delete obj.name;
+        Promise.resolve().then(() => {
+            expect(count).toEqual(2);
         });
     });
 
