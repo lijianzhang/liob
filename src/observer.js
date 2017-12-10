@@ -36,7 +36,7 @@ export default class Observer {
     }
 
     run() {
-        this.callBack(this);
+        if (this.callBack) this.callBack(this);
     }
 
     unSubscribe() {
