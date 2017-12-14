@@ -23,7 +23,7 @@ function initRender() {
             this[isReCollectDepsKey] = true;
             this.forceUpdate();
         }
-    }, `${this.constructor.name}.render()`);
+    }, `${this.name || this.displayName || this.constructor.displayName || this.constructor.displayName}.render()`);
 
     this.render = reactiveRender;
     return reactiveRender.call(this);

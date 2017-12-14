@@ -9,9 +9,19 @@ import event from './event';
  *
  */
 
+function isDisabledType(target) {
+    if (target.construct === Set) return false;
+    if (target.construct === WeakSet) return false;
+    if (target.construct === Map) return false;
+    if (target.construct === WeakMap) return false;
+    if (target.construct === HTMLDivElement) return false;
+    return true;
+}
+
 function onGet(target, key, receiver) {
     if (key === '$raw') return target;
     let value = Reflect.get(target, key, receiver);
+    if (isDisabledType(target)) return value;
     if (!liob.currentObserver) {
         return liob.dataToProxy.get(value) || value;
     } else if (isFunction(value)) {
