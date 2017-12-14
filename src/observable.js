@@ -10,18 +10,19 @@ import event from './event';
  */
 
 function isDisabledType(target) {
-    if (target.construct === Set) return false;
-    if (target.construct === WeakSet) return false;
-    if (target.construct === Map) return false;
-    if (target.construct === WeakMap) return false;
-    if (target.construct === HTMLDivElement) return false;
-    return true;
+    if (!target) return false;
+    if (target.constructor === Set) return true;
+    if (target.constructor === WeakSet) return true;
+    if (target.constructor === Map) return true;
+    if (target.constructor === WeakMap) return true;
+    if (target.constructor === HTMLDivElement) return true;
+    return false;
 }
 
 function onGet(target, key, receiver) {
     if (key === '$raw') return target;
     let value = Reflect.get(target, key, receiver);
-    if (isDisabledType(target)) return value;
+    if (isDisabledType(value)) return value;
     if (!liob.currentObserver) {
         return liob.dataToProxy.get(value) || value;
     } else if (isFunction(value)) {
@@ -32,7 +33,6 @@ function onGet(target, key, receiver) {
     const observers = liob.getObservers(target, key);
     observers.add(liob.currentObserver);
     liob.currentObserver.bindObservers.add(observers);
-
 
     return value;
 }
