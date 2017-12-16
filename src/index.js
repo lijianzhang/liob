@@ -1,6 +1,6 @@
 export { default as observable } from './observable';
 
-export { default as Observable } from './react-observable';
+export { default as reactObserver } from './react-observer';
 
 export { default as Observer, observe } from './observer';
 

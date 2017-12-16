@@ -1,5 +1,4 @@
 import Observer from './observer';
-import liob from './liob';
 
 const baseRenderKey = Symbol('baseRender');
 const isReCollectDepsKey = Symbol('isReCollectDeps');
@@ -7,7 +6,6 @@ const connectKey = Symbol('connect');
 
 function reactiveRender() {
     const res = this.$observer.collectDeps(this[baseRenderKey]);
-    liob.currentObserver = this.$observer;
     this[isReCollectDepsKey] = false;
     return res;
 }
@@ -55,7 +53,7 @@ function patch(target, funcName, runMixinFirst = false) {
     }
 }
 
-export default function Observable(target) {
+export default function ReactObserver(target) {
     if (target[connectKey]) return target;
     target[connectKey] = true;
     patch(target.prototype, 'componentWillMount', true);
