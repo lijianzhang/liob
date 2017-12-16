@@ -3,17 +3,12 @@ import liob from './liob';
 
 const baseRenderKey = Symbol('baseRender');
 const isReCollectDepsKey = Symbol('isReCollectDeps');
-const preObserverKey = Symbol('preObserver');
 const connectKey = Symbol('connect');
 
 function reactiveRender() {
     const res = this.$observer.collectDeps(this[baseRenderKey]);
     liob.currentObserver = this.$observer;
     this[isReCollectDepsKey] = false;
-    if (liob.currentObserver) {
-        this[preObserverKey] = liob.currentObserver;
-    }
-    liob.currentObserver = this.$observer;
     return res;
 }
 
@@ -35,23 +30,6 @@ const reactiveMixin = {
         this.render = initRender;
     },
 
-    componentDidMount() {
-        if (this[preObserverKey]) {
-            liob.currentObserver = this[preObserverKey];
-            this[preObserverKey] = null;
-        } else {
-            liob.currentObserver = null;
-        }
-    },
-
-    componentDidUpdate() {
-        if (this[preObserverKey]) {
-            liob.currentObserver = this[preObserverKey];
-            this[preObserverKey] = null;
-        } else {
-            liob.currentObserver = null;
-        }
-    },
     componentWillUnmount() {
         this.$observer.unSubscribe();
         this.$observer = null;
@@ -77,12 +55,10 @@ function patch(target, funcName, runMixinFirst = false) {
     }
 }
 
-export default function connect(target) {
+export default function Observable(target) {
     if (target[connectKey]) return target;
     target[connectKey] = true;
     patch(target.prototype, 'componentWillMount', true);
-    patch(target.prototype, 'componentDidMount');
-    patch(target.prototype, 'componentDidUpdate', true);
     patch(target.prototype, 'componentWillUnmount');
 
     return target;
