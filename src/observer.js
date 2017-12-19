@@ -28,6 +28,25 @@ export default class Observer {
         return res;
     }
 
+    beginCollectDeps(fn) {
+        this.clearBinds();
+        if (liob.currentObserver) {
+            this.preObserver = liob.currentObserver;
+        }
+        liob.currentObserver = this;
+        const res = fn();
+        return res;
+    }
+
+    endCollectDeps() {
+        if (this.preObserver) {
+            liob.currentObserver = this.preObserver;
+            this.preObserver = null;
+        } else {
+            liob.currentObserver = null;
+        }
+    }
+
     clearBinds() {
         this.bindObservers.forEach((observers) => {
             observers.delete(this);
