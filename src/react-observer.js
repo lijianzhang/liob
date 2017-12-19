@@ -1,3 +1,4 @@
+import React, { PureComponent } from 'react';
 import Observer from './observer';
 
 const baseRenderKey = Symbol('baseRender');
@@ -16,7 +17,7 @@ function initRender() {
             this[isReCollectDepsKey] = true;
             this.forceUpdate();
         }
-    }, `${this.name || this.displayName || this.constructor.displayName || this.constructor.displayName}.render()`);
+    }, `${this.name || this.displayName || this.constructor.displayName || this.constructor.name}.render()`);
 
     this.render = reactiveRender;
     return reactiveRender.call(this);
@@ -41,23 +42,48 @@ function patch(target, funcName, runMixinFirst = false) {
         target[funcName] = mixinFunc;
     } else {
         target[funcName] =
-            runMixinFirst === true ?
-                function funcName(...args) {
+            runMixinFirst === true
+                ? function funcName(...args) {
                     mixinFunc.apply(this, args);
                     base.apply(this, args);
-                } :
-                function funcName(...args) {
+                }
+                : function funcName(...args) {
                     base.apply(this, args);
                     mixinFunc.apply(this, args);
                 };
     }
 }
 
-export default function ReactObserver(target) {
-    if (target[connectKey]) return target;
-    target[connectKey] = true;
-    patch(target.prototype, 'componentWillMount', true);
-    patch(target.prototype, 'componentWillUnmount');
+function isReactFunction(obj) {
+    if (typeof obj === 'function') {
+        if ((obj.prototype && obj.prototype.render) || obj.isReactClass || React.Component.isPrototypeOf(obj)) {
+            return true;
+        }
+    }
 
-    return target;
+    return false;
 }
+
+export default function reactObserver(componentClass) {
+    if (componentClass[connectKey]) return componentClass;
+
+    if (isReactFunction(componentClass)) {
+        componentClass[connectKey] = true;
+        patch(componentClass.prototype, 'componentWillMount', true);
+        patch(componentClass.prototype, 'componentWillUnmount');
+    } else if (typeof componentClass === 'function') {
+        return reactObserver(class extends PureComponent {
+                static displayName = componentClass.displayName || componentClass.name;
+                static contextTypes = componentClass.contextTypes;
+                static propTypes = componentClass.propTypes;
+                static defaultProps = componentClass.defaultProps;
+                render() {
+                    return componentClass.call(this, this.props, this.context);
+                }
+        });
+    }
+
+    return componentClass;
+}
+
+export const ReactObserver = reactObserver(({ children }) => children());

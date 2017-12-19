@@ -11,6 +11,9 @@
     },
     "author": "lijianzhang",
     "license": "ISC",
+    "peerDependencies": {
+        "react": "^15.0.0"
+    },
     "devDependencies": {
         "babel-cli": "^6.26.0",
         "babel-eslint": "^8.0.2",
