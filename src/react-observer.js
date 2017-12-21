@@ -13,6 +13,7 @@ function reactiveRender() {
     } else {
         res = this.$observer.collectDep(this[baseRenderKey]);
     }
+    this[isReCollectDepsKey] = false;
     return res;
 }
 
@@ -22,7 +23,7 @@ function initRender() {
             this[isReCollectDepsKey] = true;
             this.forceUpdate();
         }
-    }, `${this.name || this.displayName || this.constructor.displayName || this.constructor.displayName}.render()`);
+    }, `${this.name || this.displayName || this.constructor.name || this.constructor.displayName}.render()`);
 
     this.render = reactiveRender;
     return reactiveRender.call(this);
