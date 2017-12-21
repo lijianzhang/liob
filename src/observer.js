@@ -21,7 +21,7 @@ export default class Observer {
 
     beginCollectDep() {
         this.clearBinds();
-        liob.collectObservers = this;
+        liob.currentObserver = this;
     }
 
     endCollectDep() {

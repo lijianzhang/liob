@@ -66,7 +66,7 @@ function patch(target, funcName, runMixinFirst = false) {
     }
 }
 
-export default function ReactObserver(target, { deep = false }) {
+export default function ReactObserver(target, opts) {
     if (typeof target === 'object') {
         return c => ReactObserver(c, target);
     }
@@ -76,7 +76,7 @@ export default function ReactObserver(target, { deep = false }) {
     patch(target.prototype, 'componentWillMount', true);
     patch(target.prototype, 'componentWillUnmount');
 
-    if (deep) {
+    if (opts && opts.deep) {
         patch(target.prototype, 'componentDidMount', true);
         patch(target.prototype, 'componentDidUpdate', true);
         target.prototype.$deep = $deep;
