@@ -3,10 +3,16 @@ import Observer from './observer';
 const baseRenderKey = Symbol('baseRender');
 const isReCollectDepsKey = Symbol('isReCollectDeps');
 const connectKey = Symbol('connect');
+const $deep = Symbol('deep');
 
 function reactiveRender() {
-    const res = this.$observer.collectDeps(this[baseRenderKey]);
-    this[isReCollectDepsKey] = false;
+    let res = null;
+    if (this.$deep) {
+        this.$observer.beginCollectDep();
+        res = this[baseRenderKey]();
+    } else {
+        res = this.$observer.collectDep(this[baseRenderKey]);
+    }
     return res;
 }
 
@@ -32,6 +38,13 @@ const reactiveMixin = {
         this.$observer.unSubscribe();
         this.$observer = null;
     },
+
+    componentDidMount() {
+        this.$observer.endCollectDep();
+    },
+    componentDidUpdate() {
+        this.$observer.endCollectDep();
+    },
 };
 
 function patch(target, funcName, runMixinFirst = false) {
@@ -53,11 +66,21 @@ function patch(target, funcName, runMixinFirst = false) {
     }
 }
 
-export default function ReactObserver(target) {
+export default function ReactObserver(target, { deep = false }) {
+    if (typeof target === 'object') {
+        return c => ReactObserver(c, target);
+    }
+
     if (target[connectKey]) return target;
     target[connectKey] = true;
     patch(target.prototype, 'componentWillMount', true);
     patch(target.prototype, 'componentWillUnmount');
+
+    if (deep) {
+        patch(target.prototype, 'componentDidMount', true);
+        patch(target.prototype, 'componentDidUpdate', true);
+        target.prototype.$deep = $deep;
+    }
 
     return target;
 }
