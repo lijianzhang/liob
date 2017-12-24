@@ -13,13 +13,14 @@ import event from './event';
 function onGet(target, key, receiver) {
     if (key === '$raw') return target;
     let value = Reflect.get(target, key, receiver);
-    if (!isObservableObject(target)) return value;
     if (!liob.currentObserver) {
         return liob.dataToProxy.get(value) || value;
     } else if (isFunction(value)) {
         return value;
-    } else if (!isPrimitive(value)) {
-        value = toObservable(value); //eslint-disable-line
+    } else if (typeof value === 'object') {
+        if (isObservableObject(value)) {
+            value = toObservable(value); //eslint-disable-line
+        }
     }
     const observers = liob.getObservers(target, key);
     observers.add(liob.currentObserver);
