@@ -21,3 +21,12 @@ export function isPrimitive(value) {
 
     return false;
 }
+
+export function isObservableObject(obj) {
+    // 判断是否非window和DOM对象的对象，
+    if (Array.isArray(obj)) return true;
+    if (!obj || obj.toString() !== '[object Object]' || obj.nodeType || obj.setInterval) {
+        return false;
+    }
+    return true;
+}

@@ -1,5 +1,5 @@
 import liob from './liob';
-import { isFunction, isPrimitive } from './utils';
+import { isFunction, isPrimitive, isObservableObject } from './utils';
 import event from './event';
 /**
  * 设计流程:
@@ -9,20 +9,11 @@ import event from './event';
  *
  */
 
-function isDisabledType(target) {
-    if (!target) return false;
-    if (target.constructor === Set) return true;
-    if (target.constructor === WeakSet) return true;
-    if (target.constructor === Map) return true;
-    if (target.constructor === WeakMap) return true;
-    if (target.constructor === HTMLDivElement) return true;
-    return false;
-}
 
 function onGet(target, key, receiver) {
     if (key === '$raw') return target;
     let value = Reflect.get(target, key, receiver);
-    if (isDisabledType(value)) return value;
+    if (!isObservableObject(target)) return value;
     if (!liob.currentObserver) {
         return liob.dataToProxy.get(value) || value;
     } else if (isFunction(value)) {
