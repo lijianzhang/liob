@@ -12,39 +12,21 @@ export default class Observer {
     bindObservers = new Set();
 
     /** 执行fn并对fn进行依赖收集 */
-    collectDeps(fn) {
-        this.clearBinds();
-        if (liob.currentObserver) {
-            this.preObserver = liob.currentObserver;
-        }
-        liob.currentObserver = this;
+    collectDep(fn) {
+        this.beginCollectDep();
         const res = fn();
-        if (this.preObserver) {
-            liob.currentObserver = this.preObserver;
-            this.preObserver = null;
-        } else {
-            liob.currentObserver = null;
-        }
+        this.endCollectDep();
         return res;
     }
 
-    beginCollectDeps(fn) {
+    beginCollectDep() {
         this.clearBinds();
-        if (liob.currentObserver) {
-            this.preObserver = liob.currentObserver;
-        }
         liob.currentObserver = this;
-        const res = fn();
-        return res;
     }
 
-    endCollectDeps() {
-        if (this.preObserver) {
-            liob.currentObserver = this.preObserver;
-            this.preObserver = null;
-        } else {
-            liob.currentObserver = null;
-        }
+    endCollectDep() {
+        const index = liob.collectObservers.indexOf(this);
+        liob.collectObservers.splice(index, 1);
     }
 
     clearBinds() {

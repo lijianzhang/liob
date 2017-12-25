@@ -17,6 +17,9 @@ class Liob {
      */
   queue = new Set();
 
+
+  collectObservers = [];
+
   /**
      * action栈
      */
@@ -25,7 +28,21 @@ class Liob {
   /**
      * 当前的Observer
      */
-  currentObserver = null;
+  get currentObserver() {
+      return this.collectObservers[this.collectObservers.length - 1];
+  }
+
+  set currentObserver(observer) {
+      if (observer === null) {
+          this.collectObservers.pop();
+          return;
+      }
+      const index = this.collectObservers.indexOf(observer);
+      if (index > -1) {
+          this.collectObservers.splice(index, 1);
+      }
+      this.collectObservers.push(observer);
+  }
 
   isObservable(raw) {
       return this.dataToProxy.has(raw);

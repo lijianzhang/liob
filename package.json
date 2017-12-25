@@ -1,6 +1,6 @@
 {
     "name": "liob",
-    "version": "0.0.71",
+    "version": "0.1.4",
     "description": "响应式的数据管理库",
     "main": "lib/index.js",
     "scripts": {
@@ -11,9 +11,6 @@
     },
     "author": "lijianzhang",
     "license": "ISC",
-    "peerDependencies": {
-        "react": "^15.0.0"
-    },
     "devDependencies": {
         "babel-cli": "^6.26.0",
         "babel-eslint": "^8.0.2",

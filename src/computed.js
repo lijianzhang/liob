@@ -34,10 +34,10 @@ export default function computed(target, key, descriptor) {
                 }
             }, `${target.constructor.name}.${key}`);
 
-            obj.preValue = obj.observer.collectDeps(obj.newGet);
+            obj.preValue = obj.observer.collectDep(obj.newGet);
             obj.isShouldUpdate = false;
         } else if (obj.isShouldUpdate) {
-            obj.preValue = obj.observer.collectDeps(obj.newGet);
+            obj.preValue = obj.observer.collectDep(obj.newGet);
             obj.isShouldUpdate = false;
         }
         return obj.preValue;

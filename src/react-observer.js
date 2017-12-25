@@ -1,12 +1,18 @@
-import React, { PureComponent } from 'react';
 import Observer from './observer';
 
 const baseRenderKey = Symbol('baseRender');
 const isReCollectDepsKey = Symbol('isReCollectDeps');
 const connectKey = Symbol('connect');
+const $deep = Symbol('deep');
 
 function reactiveRender() {
-    const res = this.$observer.collectDeps(this[baseRenderKey]);
+    let res = null;
+    if (this.$deep) {
+        this.$observer.beginCollectDep();
+        res = this[baseRenderKey]();
+    } else {
+        res = this.$observer.collectDep(this[baseRenderKey]);
+    }
     this[isReCollectDepsKey] = false;
     return res;
 }
@@ -17,7 +23,7 @@ function initRender() {
             this[isReCollectDepsKey] = true;
             this.forceUpdate();
         }
-    }, `${this.name || this.displayName || this.constructor.displayName || this.constructor.name}.render()`);
+    }, `${this.name || this.displayName || this.constructor.name || this.constructor.displayName}.render()`);
 
     this.render = reactiveRender;
     return reactiveRender.call(this);
@@ -33,6 +39,13 @@ const reactiveMixin = {
         this.$observer.unSubscribe();
         this.$observer = null;
     },
+
+    componentDidMount() {
+        this.$observer.endCollectDep();
+    },
+    componentDidUpdate() {
+        this.$observer.endCollectDep();
+    },
 };
 
 function patch(target, funcName, runMixinFirst = false) {
@@ -42,48 +55,33 @@ function patch(target, funcName, runMixinFirst = false) {
         target[funcName] = mixinFunc;
     } else {
         target[funcName] =
-            runMixinFirst === true
-                ? function funcName(...args) {
+            runMixinFirst === true ?
+                function funcName(...args) {
                     mixinFunc.apply(this, args);
                     base.apply(this, args);
-                }
-                : function funcName(...args) {
+                } :
+                function funcName(...args) {
                     base.apply(this, args);
                     mixinFunc.apply(this, args);
                 };
     }
 }
 
-function isReactFunction(obj) {
-    if (typeof obj === 'function') {
-        if ((obj.prototype && obj.prototype.render) || obj.isReactClass || React.Component.isPrototypeOf(obj)) {
-            return true;
-        }
+export default function ReactObserver(target, opts) {
+    if (typeof target === 'object') {
+        return c => ReactObserver(c, target);
     }
 
-    return false;
-}
+    if (target[connectKey]) return target;
+    target[connectKey] = true;
+    patch(target.prototype, 'componentWillMount', true);
+    patch(target.prototype, 'componentWillUnmount');
 
-export default function reactObserver(componentClass) {
-    if (componentClass[connectKey]) return componentClass;
-
-    if (isReactFunction(componentClass)) {
-        componentClass[connectKey] = true;
-        patch(componentClass.prototype, 'componentWillMount', true);
-        patch(componentClass.prototype, 'componentWillUnmount');
-    } else if (typeof componentClass === 'function') {
-        return reactObserver(class extends PureComponent {
-                static displayName = componentClass.displayName || componentClass.name;
-                static contextTypes = componentClass.contextTypes;
-                static propTypes = componentClass.propTypes;
-                static defaultProps = componentClass.defaultProps;
-                render() {
-                    return componentClass.call(this, this.props, this.context);
-                }
-        });
+    if (opts && opts.deep) {
+        patch(target.prototype, 'componentDidMount', true);
+        patch(target.prototype, 'componentDidUpdate', true);
+        target.prototype.$deep = $deep;
     }
 
-    return componentClass;
+    return target;
 }
-
-export const ReactObserver = reactObserver(({ children }) => children());
