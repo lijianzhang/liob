@@ -5,14 +5,6 @@ import event from '../src/event';
 import liob from '../src/liob';
 import asyncAction from '../src/async-action';
 
-function delay(time, value, shouldThrow = false) {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            if (shouldThrow) reject(value);
-            else resolve(value);
-        }, time);
-    });
-}
 
 describe('multiple observable test', () => {
     test('obj and toObservable(obj)should equal', () => {
@@ -47,17 +39,10 @@ describe('multiple observable test', () => {
             name;
             age;
 
-
-            @asyncAction
-            test = function * test() {
-                this.name =  yield 'bb';
-                return 1;
-            }
         }
         
 
         const user = new User();
-        const res = await user.test();
         expect(liob.proxys.has(user)).toBeTruthy();
     });
 });

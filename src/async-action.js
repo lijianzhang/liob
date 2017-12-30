@@ -10,6 +10,7 @@ import { invariant } from './utils';
  */
 
 function isGenerator(obj) {
+    if (!obj) return false;
     return typeof obj.next === 'function' && typeof obj.throw === 'function';
 }
 
@@ -42,13 +43,9 @@ async function loopNext(gen, res = {}) {
 export async function asyncAction(fn, ...args) {
     invariant(isGeneratorFunction(fn), `${fn.name || 'fn'} must be a generator function`);
     const generator = fn.call(this, ...args);
-    if (!generator.next) return generator;
-    let res;
-    try {
-        res = await loopNext(generator);
-    } catch (e) {
-        throw e;
-    }
+
+    const res = await loopNext(generator);
+
     return res;
 }
 

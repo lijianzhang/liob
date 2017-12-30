@@ -17,8 +17,9 @@ export default function decorativeAction(target, key, descriptor) {
         const { value } = descriptor;
         descriptor.value = function wrapAction(...args) {
             event.emit('action', `${target.constructor.name}.${key}`);
-            runAction.call(this, value, ...args);
+            const res = runAction.call(this, value, ...args);
             event.emit('endAction', `${target.constructor.name}.${key}`);
+            return res;
         };
         return descriptor;
     }
