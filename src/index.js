@@ -6,6 +6,8 @@ export { default as Observer, observe } from './observer';
 
 export { default as action } from './action';
 
+export { default as asyncAction } from './async-action';
+
 export { default as liob } from './liob';
 
 export { default as computed } from './computed';

@@ -49,7 +49,7 @@ export default class Observer {
 export function observe(fn, name = 'observe') {
     if (!fn) throw new Error('you need set callBack');
     const ob = new Observer((observer) => {
-        observer.collectDeps(fn);
+        observer.collectDep(fn);
     }, name);
     ob.run();
     return ob;

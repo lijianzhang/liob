@@ -22,6 +22,10 @@ export function isPrimitive(value) {
     return false;
 }
 
+export function invariant(cond, message = 'Illegal state') {
+    if (!cond) throw new Error(`[liob-error] ${message}`);
+}
+
 export function isObservableObject(obj) {
     // 判断是否非window和DOM对象的对象，
     if (Array.isArray(obj)) return true;
