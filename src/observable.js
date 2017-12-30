@@ -1,6 +1,7 @@
 import liob from './liob';
 import { isFunction, isPrimitive, isObservableObject } from './utils';
 import event from './event';
+import { invariant } from './utils';
 /**
  * 设计流程:
  * observable 函数传入一个待观察的对象, 对改对象进行Proxy的封装
@@ -62,8 +63,24 @@ export function toObservable(store) {
     return proxy;
 }
 
-export default function decorativeObservable(target) {
-    if (isFunction(target)) {
+export default function decorativeObservable(target, key, descriptor) {
+    if (key && descriptor) {
+        const { value, initializer } = descriptor;
+        if (value) {
+            invariant(typeof value === 'object', 'observable must a object');
+            descriptor.value = function wrapAction(...args) {
+                return toObservable.call(this, value, ...args);
+            };
+        } else if (initializer) {
+            descriptor.value = function wrapAction(...args) {
+                const value = initializer();
+                invariant(typeof value === 'object', 'observable must a object');
+                return toObservable.call(this, value, ...args);
+            };
+            delete descriptor.initializer;
+        }
+        return descriptor;
+    } else if (isFunction(target)) {
         return new Proxy(target, {
             construct(Cls, argumentsList) {
                 const ob = new Cls(...argumentsList);
@@ -77,5 +94,6 @@ export default function decorativeObservable(target) {
             },
         });
     }
+
     return toObservable(target);
 }
