@@ -1,4 +1,6 @@
-import { observe, observable } from '../src';
+import { observable } from '../src';
+import { observe } from '../src/observer';
+
 import liob from '../src/liob';
 
 /* eslint-disable no-unused-expressions */

@@ -2,11 +2,12 @@
  * @Author: lijianzhang
  * @Date: 2017-12-31 00:36:33
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2017-12-31 00:54:03
+ * @Last Modified time: 2018-03-10 13:56:40
  */
 
 
-import { action, observe, observable } from '../src';
+import { action, observable } from '../src';
+import { observe } from '../src/observer';
 
 
 describe('multiple action test', () => {

@@ -1,5 +1,7 @@
-import clone from 'lodash.clone';
+
 import event from './event';
+
+const clone = require('lodash.clone');
 
 export default function useLog() {
     const unAction = event.on('action', (name) => {
