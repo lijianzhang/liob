@@ -17,11 +17,20 @@
       "polyfill": false,
       "regenerator": true,
       "moduleName": "babel-runtime"
-    }], "external-helpers"],
+    }]],
     "env": {
         "test": {
-            "presets": [["env"], "stage-0"],
+            "presets": [["env", {
+                "targets": {"node": "current"},
+                "include": ["transform-es2015-classes"]
+            }], "stage-0", "react"],
             "plugins": ["transform-decorators-legacy"]
+        },
+        "commonjs": {
+            "plugins": [
+                "istanbul",
+                ["transform-es2015-modules-commonjs", { "loose": true }]
+              ]
         }
     }
 }

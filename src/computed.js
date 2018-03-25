@@ -12,7 +12,7 @@ export default function computed(target, key, descriptor) {
             self[computedKey] = {
                 observers: new Set(),
                 preValue: null,
-                newGet: newGet.bind(this),
+                newGet,
                 observer: null,
                 isShouldUpdate: false,
             };
