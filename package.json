@@ -1,6 +1,6 @@
 {
     "name": "liob",
-    "version": "0.1.8",
+    "version": "0.1.9",
     "description": "响应式的数据管理库",
     "main": "lib/index.js",
     "module": "es/index.js",
@@ -49,7 +49,10 @@
         "collectCoverageFrom": [
             "src/**/*.js"
         ],
-        "setupFiles": ["<rootDir>/test/shim.js", "<rootDir>/test/setup.js"]
+        "setupFiles": [
+            "<rootDir>/test/shim.js",
+            "<rootDir>/test/setup.js"
+        ]
     },
     "dependencies": {
         "lodash.clone": "^4.5.0",
