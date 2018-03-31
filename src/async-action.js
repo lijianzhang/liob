@@ -1,3 +1,10 @@
+/*
+ * @Author: lijianzhang
+ * @Date: 2018-03-31 21:30:17
+ * @Last Modified by: lijianzhang
+ * @Last Modified time: 2018-03-31 21:53:20
+ * @flow
+ */
 import { runAction } from './action';
 import { invariant } from './utils';
 
@@ -40,7 +47,7 @@ async function loopNext(gen, res = {}) {
 }
 
 
-export async function asyncAction(fn, ...args) {
+export async function asyncAction(fn: Function, ...args: Array<any>) {
     invariant(isGeneratorFunction(fn), `${fn.name || 'fn'} must be a generator function`);
     const generator = fn.call(this, ...args);
 
@@ -50,7 +57,7 @@ export async function asyncAction(fn, ...args) {
 }
 
 
-export default function decorativeAsyncAction(target, key, descriptor) {
+export default function decorativeAsyncAction(target: Function, key: string, descriptor: any) {
     if (key && descriptor) {
         const { value, initializer } = descriptor;
         if (value) {
@@ -65,6 +72,6 @@ export default function decorativeAsyncAction(target, key, descriptor) {
         }
         return descriptor;
     }
-    return (...args) => asyncAction(target, ...args);
+    return (...args: Array<any>) => asyncAction(target, ...args);
 }
 

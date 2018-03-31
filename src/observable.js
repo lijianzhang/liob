@@ -1,7 +1,13 @@
+/*
+ * @Author: lijianzhang
+ * @Date: 2018-03-31 21:04:00
+ * @Last Modified by: lijianzhang
+ * @Last Modified time: 2018-03-31 21:28:58
+ * @flow
+ */
 import liob from './liob';
-import { isFunction, isPrimitive, isObservableObject } from './utils';
+import { isFunction, isPrimitive, isObservableObject, invariant } from './utils';
 import event from './event';
-import { invariant } from './utils';
 /**
  * 设计流程:
  * observable 函数传入一个待观察的对象, 对改对象进行Proxy的封装
@@ -42,17 +48,19 @@ function onSet(target, key, value, receiver) {
     return true;
 }
 
-function onDelete(target, key, receiver) {
-    const result = Reflect.deleteProperty(target, key, receiver);
+function onDelete(target, key) {
+    const result = Reflect.deleteProperty(target, key);
     const observers = liob.getObservers(target, key);
     liob.pushQueue(observers);
     return result;
 }
 
-export function toObservable(store) {
+export function toObservable(store: {}): {} {
     if (isPrimitive(store) || liob.isProxy(store)) return store;
-    if (liob.isObservable(store)) return liob.dataToProxy.get(store);
-    const proxy = new Proxy(store, {
+    let proxy = liob.dataToProxy.get(store);
+    if (proxy) return proxy;
+
+    proxy = new Proxy(store, {
         get: onGet,
         set: onSet,
         deleteProperty: onDelete,
@@ -63,7 +71,8 @@ export function toObservable(store) {
     return proxy;
 }
 
-export default function decorativeObservable(target, key, descriptor) {
+
+export default function decorativeObservable(target: Function | {}, key: string, descriptor: any) {
     if (key && descriptor) {
         const { value, initializer } = descriptor;
         if (value) {
@@ -80,8 +89,8 @@ export default function decorativeObservable(target, key, descriptor) {
             delete descriptor.initializer;
         }
         return descriptor;
-    } else if (isFunction(target)) {
-        return new Proxy(target, {
+    } else if (typeof target === 'function') {
+        const proxy: Proxy<Function> = new Proxy(target, {
             construct(Cls, argumentsList) {
                 const ob = new Cls(...argumentsList);
                 const proxy = toObservable(ob);
@@ -93,6 +102,7 @@ export default function decorativeObservable(target, key, descriptor) {
                 return proxy;
             },
         });
+        return proxy;
     }
 
     return toObservable(target);

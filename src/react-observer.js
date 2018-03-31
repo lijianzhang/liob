@@ -1,3 +1,10 @@
+/*
+ * @Author: lijianzhang
+ * @Date: 2018-03-31 21:40:26
+ * @Last Modified by: lijianzhang
+ * @Last Modified time: 2018-03-31 22:14:32
+ * @flow
+ */
 import Observer from './observer';
 
 const baseRenderKey = Symbol('baseRender');
@@ -67,9 +74,9 @@ function patch(target, funcName, runMixinFirst = false) {
     }
 }
 
-export default function ReactObserver(target, opts) {
+export default function ReactObserver<T: Function>(target: Function | T, opts?: {deep: boolean}) {
     if (typeof target === 'object') {
-        return c => ReactObserver(c, target);
+        return (c: Function) => ReactObserver(c, target);
     }
 
     if (target[connectKey]) return target;
@@ -82,6 +89,5 @@ export default function ReactObserver(target, opts) {
         patch(target.prototype, 'componentDidUpdate', true);
         target.prototype.$deep = $deep;
     }
-
     return target;
 }

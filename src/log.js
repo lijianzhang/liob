@@ -1,3 +1,11 @@
+/* eslint-disable no-console */
+/*
+ * @Author: lijianzhang
+ * @Date: 2018-03-31 21:38:41
+ * @Last Modified by: lijianzhang
+ * @Last Modified time: 2018-03-31 21:39:47
+ * @flow
+ */
 
 import event from './event';
 

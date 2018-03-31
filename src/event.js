@@ -1,17 +1,29 @@
+/*
+ * @Author: lijianzhang
+ * @Date: 2018-03-31 21:33:47
+ * @Last Modified by: lijianzhang
+ * @Last Modified time: 2018-03-31 21:38:32
+ * @flow
+ */
 class Event {
-    listenerMap = new Map();
+    listenerMap: Map<string, Set<Function>> = new Map();
 
-    on(type, fn) {
-        if (this.listenerMap.has(type)) this.listenerMap.get(type).add(fn);
-        else this.listenerMap.set(type, new Set([fn]));
+    on(type: string, fn: Function) {
+        const set = this.listenerMap.get(type);
+        if (set) {
+            set.add(fn);
+        } else {
+            this.listenerMap.set(type, new Set([fn]));
+        }
         return () => this.unListener(type, fn);
     }
 
-    unListener(type, fn) {
-        this.listenerMap.get(type).delete(fn);
+    unListener(type: string, fn: Function) {
+        const set = this.listenerMap.get(type);
+        if (set) set.delete(fn);
     }
 
-    emit(type, data) {
+    emit(type: string, data: any) {
         const fns = this.listenerMap.get(type);
         if (fns) {
             fns.forEach((listener) => {

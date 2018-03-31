@@ -1,7 +1,14 @@
+/*
+ * @Author: lijianzhang
+ * @Date: 2018-03-31 20:31:49
+ * @Last Modified by: lijianzhang
+ * @Last Modified time: 2018-03-31 21:05:36
+ * @flow
+ */
 import liob from './liob';
 
 export default class Observer {
-    constructor(callBack, name) {
+    constructor(callBack: Function, name?: string) {
         /**
          * 每次依赖被修改的时候都会触发callBack
          */
@@ -9,10 +16,16 @@ export default class Observer {
         this.name = name;
     }
 
-    bindObservers = new Set();
+    callBack: ?Function;
+
+    name: ?string;
+
+    bindObservers: Set<Set<Observer>> = new Set();
+
+    observers: Set<Observer>;
 
     /** 执行fn并对fn进行依赖收集 */
-    collectDep(fn) {
+    collectDep(fn: Function) {
         this.beginCollectDep();
         const res = fn();
         this.endCollectDep();
@@ -46,7 +59,7 @@ export default class Observer {
     }
 }
 
-export function observe(fn, name = 'observe') {
+export function observe(fn: Function, name: string = 'observe') {
     if (!fn) throw new Error('you need set callBack');
     const ob = new Observer((observer) => {
         observer.collectDep(fn);

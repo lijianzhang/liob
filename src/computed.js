@@ -1,7 +1,14 @@
+/*
+ * @Author: lijianzhang
+ * @Date: 2018-03-31 21:33:17
+ * @Last Modified by:   lijianzhang
+ * @Last Modified time: 2018-03-31 21:33:17
+ * @flow
+ */
 import Obersver from './observer';
 import liob from './liob';
 
-export default function computed(target, key, descriptor) {
+export default function computed(target: Function, key: string, descriptor: any) {
     const computedKey = Symbol(key);
 
     const newGet = descriptor.get;

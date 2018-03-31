@@ -19,6 +19,8 @@ module.exports = {
         'react/jsx-indent-props': [1, 4],
         'react/jsx-indent': [1, 4],
         'no-console': ['warn', { allow: ['warn', 'error'] }],
+        "flowtype/define-flow-type": 1,
+        "flowtype/use-flow-type": 1,
     },
     env: {
         browser: true,
@@ -29,5 +31,5 @@ module.exports = {
         process: true,
         liob: true,
     },
-    plugins: ['jest'],
+    plugins: ['jest', 'flowtype'],
 };
