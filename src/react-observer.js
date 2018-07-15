@@ -2,19 +2,23 @@
  * @Author: lijianzhang
  * @Date: 2018-03-31 21:40:26
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-03-31 22:14:32
+ * @Last Modified time: 2018-07-15 13:17:48
  * @flow
  */
+import React from 'react';
 import Observer from './observer';
 
 const baseRenderKey = Symbol('baseRender');
 const isReCollectDepsKey = Symbol('isReCollectDeps');
 const connectKey = Symbol('connect');
 const $deep = Symbol('deep');
+const $componentWillMount = Symbol('componentWillMount');
+
+const isOldVersion = +React.version.split('.')[0] < 16;
 
 function reactiveRender() {
     let res = null;
-    if (this.$deep) {
+    if (this.$deep && isOldVersion) {
         this.$observer.beginCollectDep();
         res = this[baseRenderKey]();
     } else {
@@ -26,7 +30,7 @@ function reactiveRender() {
 
 function initRender() {
     this.$observer = new Observer(() => {
-        if (!this[isReCollectDepsKey]) {
+        if (!this[isReCollectDepsKey] && this.$componentWillMount) {
             this[isReCollectDepsKey] = true;
             this.forceUpdate();
         }
@@ -38,6 +42,7 @@ function initRender() {
 
 const reactiveMixin = {
     componentWillMount() {
+        this[$componentWillMount] = true;
         this[baseRenderKey] = this.render.bind(this);
         this.render = initRender;
     },
@@ -84,7 +89,7 @@ export default function ReactObserver<T: Function>(target: Function | T, opts?: 
     patch(target.prototype, 'componentWillMount', true);
     patch(target.prototype, 'componentWillUnmount');
 
-    if (opts && opts.deep) {
+    if (opts && opts.deep && isOldVersion) {
         patch(target.prototype, 'componentDidMount', true);
         patch(target.prototype, 'componentDidUpdate', true);
         target.prototype.$deep = $deep;

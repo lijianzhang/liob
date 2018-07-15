@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-03-31 21:04:00
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-03-31 21:28:58
+ * @Last Modified time: 2018-07-15 13:19:36
  * @flow
  */
 import liob from './liob';
@@ -71,6 +71,8 @@ export function toObservable(store: {}): {} {
     return proxy;
 }
 
+const $raw = Symbol('$raw');
+
 
 export default function decorativeObservable(target: Function | {}, key: string, descriptor: any) {
     if (key && descriptor) {
@@ -90,6 +92,12 @@ export default function decorativeObservable(target: Function | {}, key: string,
         }
         return descriptor;
     } else if (typeof target === 'function') {
+        target[$raw] = target;
+
+        if (target.__proto__[$raw]) { // eslint-disable-line
+            target.__proto__ = target.__proto__[$raw]; // eslint-disable-line
+        }
+
         const proxy: Proxy<Function> = new Proxy(target, {
             construct(Cls, argumentsList) {
                 const ob = new Cls(...argumentsList);

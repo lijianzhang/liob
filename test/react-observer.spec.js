@@ -2,7 +2,16 @@
 
 import React, { Component } from 'react';
 import { mount } from 'enzyme';
-import { reactObserver, observable, action, useLog } from '../src';
+import { reactObserver, observable, action } from '../src';
+
+function delay(time, value, shouldThrow = false) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (shouldThrow) reject(value);
+            else resolve(value);
+        }, time);
+    });
+}
 
 describe('react-observer', () => {
     @observable
@@ -15,11 +24,8 @@ describe('react-observer', () => {
             }
     }
 
-    test('When the observable data changes, the component will be re-rendered', () => {
+    test('When the observable data changes, the component will be re-rendered', async () => {
         const store = new Store();
-
-        const unlog = useLog();
-
         @reactObserver
         class App extends Component {
             render() {
@@ -30,8 +36,11 @@ describe('react-observer', () => {
         const app = mount(<App />);
         expect(app.text()).toBe('1');
         store.addNum();
-        unlog();
+        await delay(1000);
+
         expect(app.text()).toBe('2');
+
+        await delay(1000);
     });
 
 
