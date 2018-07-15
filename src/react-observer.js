@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-03-31 21:40:26
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-07-15 13:17:48
+ * @Last Modified time: 2018-07-15 13:44:18
  * @flow
  */
 import React from 'react';
@@ -30,7 +30,7 @@ function reactiveRender() {
 
 function initRender() {
     this.$observer = new Observer(() => {
-        if (!this[isReCollectDepsKey] && this.$componentWillMount) {
+        if (!this[isReCollectDepsKey] && this[$componentWillMount]) {
             this[isReCollectDepsKey] = true;
             this.forceUpdate();
         }
