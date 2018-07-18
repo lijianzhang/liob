@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-03-31 21:04:00
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-07-15 13:19:36
+ * @Last Modified time: 2018-07-19 00:24:03
  * @flow
  */
 import liob from './liob';
@@ -20,18 +20,19 @@ import event from './event';
 function onGet(target, key, receiver) {
     if (key === '$raw') return target;
     let value = Reflect.get(target, key, receiver);
-    if (!liob.currentObserver) {
-        return liob.dataToProxy.get(value) || value;
-    } else if (isFunction(value)) {
+    if (isFunction(value)) {
         return value;
     } else if (typeof value === 'object') {
         if (isObservableObject(value)) {
             value = toObservable(value); //eslint-disable-line
         }
     }
-    const observers = liob.getObservers(target, key);
-    observers.add(liob.currentObserver);
-    liob.currentObserver.bindObservers.add(observers);
+
+    if (liob.currentObserver) {
+        const observers = liob.getObservers(target, key);
+        observers.add(liob.currentObserver);
+        liob.currentObserver.bindObservers.add(observers);
+    }
 
     return value;
 }
