@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-03-31 20:33:58
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-03-31 21:51:37
+ * @Last Modified time: 2018-08-01 15:15:28
  * @flow
  */
 import event from './event';
@@ -30,6 +30,10 @@ class Liob {
 
 
   collectObservers = [];
+
+  onError(error) {
+      throw error;
+  }
 
   /**
      * action栈
