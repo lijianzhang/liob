@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-03-31 21:40:26
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-08-02 16:48:11
+ * @Last Modified time: 2018-08-02 17:19:52
  * @flow
  */
 import React from 'react';
@@ -91,20 +91,13 @@ function createObserverComponent(component) {
     };
 }
 
-function ObserverComponent({ children, render }) {
-    let Component = children || render;
-    if (!Component) return null;
-    Component = Observer(Component);
-    return React.createElement(Component);
-}
 
 export default function ReactObserver<T: Function>(target: Function | T, opts?: {deep: boolean}) {
     if (typeof target === 'object') {
-        if (target.render || target.children) return ObserverComponent(target);
         return (c: Function) => ReactObserver(c, target);
     }
 
-    if (typeof target === 'function' && !target.prototype.render) return ReactObserver(createObserverComponent(target));
+    if (typeof target === 'function' && !target.prototype) return ReactObserver(createObserverComponent(target));
 
     if (target[connectKey]) return target;
 
@@ -118,4 +111,11 @@ export default function ReactObserver<T: Function>(target: Function | T, opts?: 
         target.prototype.$deep = $deep;
     }
     return target;
+}
+
+export function ObserverComponent({ children, render }) {
+    let Component = children || render;
+    if (!Component) return null;
+    Component = ReactObserver(Component);
+    return React.createElement(Component);
 }

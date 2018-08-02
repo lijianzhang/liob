@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-03-31 21:49:53
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-07-15 11:53:48
+ * @Last Modified time: 2018-08-02 17:20:18
  * @flow
  */
 
@@ -11,6 +11,8 @@ export { default as observable } from './observable';
 export { toObservable } from './observable';
 
 export { default as reactObserver } from './react-observer';
+
+export { ObserverComponent } from './react-observer';
 
 export { default as Observer } from './react-observer';
 

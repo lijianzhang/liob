@@ -13,10 +13,9 @@ export function observable<T>(target: T): T;
 
 export function reactObserver<T>(target: T): T;
 
-export function Observer(stores: string[]): <T extends IReactComponent>(clazz: T) => void
-export function Observer<T extends IReactComponent>(stores: string[], clazz: T): T
-export function Observer<T extends IReactComponent>(target: T): T
-export class Observer extends React.Component<
+export function Observer<T extends IReactComponent>(target: T, option: { deep?: boolean }): T;
+export function Observer<T extends IReactComponent>(target: T): T;
+export class ObserverComponent extends React.Component<
     {
         children?: () => React.ReactNode
         render?: () => React.ReactNode
