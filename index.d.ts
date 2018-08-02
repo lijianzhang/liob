@@ -13,7 +13,7 @@ export function observable<T>(target: T): T;
 
 export function reactObserver<T>(target: T): T;
 
-export function Observer<T extends IReactComponent>(target: T, option: { deep?: boolean }): T;
+export function Observer<T extends IReactComponent>(target: T, option?: { deep?: boolean }): T;
 export function Observer<T extends IReactComponent>(target: T): T;
 export class ObserverComponent extends React.Component<
     {
