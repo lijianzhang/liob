@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-03-31 21:40:26
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-08-02 14:26:48
+ * @Last Modified time: 2018-08-02 16:48:11
  * @flow
  */
 import React from 'react';
@@ -91,8 +91,16 @@ function createObserverComponent(component) {
     };
 }
 
+function ObserverComponent({ children, render }) {
+    let Component = children || render;
+    if (!Component) return null;
+    Component = Observer(Component);
+    return React.createElement(Component);
+}
+
 export default function ReactObserver<T: Function>(target: Function | T, opts?: {deep: boolean}) {
     if (typeof target === 'object') {
+        if (target.render || target.children) return ObserverComponent(target);
         return (c: Function) => ReactObserver(c, target);
     }
 

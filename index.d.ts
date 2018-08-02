@@ -1,11 +1,28 @@
 
-export function action<T, K extends string>(target: T, key: K, descriptor: PropertyDescriptor): PropertyDescriptor;
+import React from "react";
+
+export type IReactComponent<P = any> =
+    | React.StatelessComponent<P>
+    | React.ComponentClass<P>
+    | React.ClassicComponentClass<P>;
+
+
+export function action<T>(target: T, key: string): any;
 
 export function observable<T>(target: T): T;
 
 export function reactObserver<T>(target: T): T;
 
-export function Observer<T>(target: T): T;
+export function Observer(stores: string[]): <T extends IReactComponent>(clazz: T) => void
+export function Observer<T extends IReactComponent>(stores: string[], clazz: T): T
+export function Observer<T extends IReactComponent>(target: T): T
+export class Observer extends React.Component<
+    {
+        children?: () => React.ReactNode
+        render?: () => React.ReactNode
+    },
+    {}
+> {}
 
 export function asyncAction(
     target: Object,
