@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-03-31 21:40:26
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-07-15 13:44:18
+ * @Last Modified time: 2018-08-02 14:26:48
  * @flow
  */
 import React from 'react';
@@ -79,12 +79,27 @@ function patch(target, funcName, runMixinFirst = false) {
     }
 }
 
+function createObserverComponent(component) {
+    return class extends React.Component {
+        static displayName = component.displayName || component.name
+        static propTypes = component.propTypes
+        static contextTypes = component.contextTypes
+        static defaultProps = component.defaultProps
+        render() {
+            return component.call(this, this.props, this.context);
+        }
+    };
+}
+
 export default function ReactObserver<T: Function>(target: Function | T, opts?: {deep: boolean}) {
     if (typeof target === 'object') {
         return (c: Function) => ReactObserver(c, target);
     }
 
+    if (typeof target === 'function' && !target.prototype.render) return ReactObserver(createObserverComponent(target));
+
     if (target[connectKey]) return target;
+
     target[connectKey] = true;
     patch(target.prototype, 'componentWillMount', true);
     patch(target.prototype, 'componentWillUnmount');
