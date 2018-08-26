@@ -14,10 +14,9 @@ export function computed<T>(target: T, key: string): any
 export function useLog(): () => void;
 
 export function observable<T>(target: T): T
+export function toObservable(target: object): Proxy<object>
 
 export class Observer { constructor(callBack: Function, name?: string) }
-
-export function observer(callBack: Function, name?: string): Observer;
 
 export const liob: {
     onError(error: Error): any;
