@@ -15,14 +15,17 @@ export function useLog(): () => void;
 
 export function observable<T>(target: T): T
 
-export function reactObserver<T>(target: T): T
+export class Observer { constructor(callBack: Function, name?: string) }
+
+export function observer(callBack: Function, name?: string): Observer;
 
 export const liob: {
     onError(error: Error): any;
 }
 
-export function Observer<T extends IReactComponent>(target: T, option?: { deep?: boolean }): T
-export function Observer<T extends IReactComponent>(target: T): T
+
+export function reactObserver<T extends IReactComponent>(target: T, option?: { deep?: boolean }): T
+export function reactObserver<T extends IReactComponent>(target: T): T
 export class ObserverComponent extends React.Component<
     {
         children?: () => React.ReactNode
