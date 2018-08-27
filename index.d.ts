@@ -14,15 +14,17 @@ export function computed<T>(target: T, key: string): any
 export function useLog(): () => void;
 
 export function observable<T>(target: T): T
+export function toObservable(target: object): Proxy<object>
 
-export function reactObserver<T>(target: T): T
+export class Observer { constructor(callBack: Function, name?: string) }
 
 export const liob: {
     onError(error: Error): any;
 }
 
-export function Observer<T extends IReactComponent>(target: T, option?: { deep?: boolean }): T
-export function Observer<T extends IReactComponent>(target: T): T
+
+export function reactObserver<T extends IReactComponent>(target: T, option?: { deep?: boolean }): T
+export function reactObserver<T extends IReactComponent>(target: T): T
 export class ObserverComponent extends React.Component<
     {
         children?: () => React.ReactNode
