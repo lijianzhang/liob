@@ -1,6 +1,6 @@
 {
     "name": "liob",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "description": "响应式数据处理库",
     "keywords": [
         "liob",
@@ -45,8 +45,8 @@
     "jest": {
         "transform": {
             "^.+\\.tsx?$": "ts-jest"
-         },
-         "tsConfigFile": "tsconfig.json",
+        },
+        "tsConfigFile": "tsconfig.json",
         "collectCoverageFrom": [
             "src/**/*.ts",
             "src/**/*.js"
@@ -57,12 +57,12 @@
         ],
         "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
         "moduleFileExtensions": [
-          "ts",
-          "tsx",
-          "js",
-          "jsx",
-          "json",
-          "node"
+            "ts",
+            "tsx",
+            "js",
+            "jsx",
+            "json",
+            "node"
         ]
     },
     "dependencies": {
