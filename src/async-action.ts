@@ -2,8 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-03-31 21:30:17
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-03-31 21:53:20
- * @flow
+ * @Last Modified time: 2018-08-29 23:11:59
  */
 import { runAction } from './action';
 import { invariant } from './utils';
@@ -16,7 +15,7 @@ import { invariant } from './utils';
  * @api private
  */
 
-function isGenerator(obj) {
+function isGenerator(obj?: Iterator<any>) {
     if (!obj) return false;
     return typeof obj.next === 'function' && typeof obj.throw === 'function';
 }
@@ -37,7 +36,7 @@ function isGeneratorFunction(obj) {
 }
 
 
-async function loopNext(gen, res = {}) {
+async function loopNext(gen, res: IteratorResult<any> = { done: false, value: null }) {
     if (res.done) return res.value;
     res = runAction.call(gen, gen.next, res.value);
     if (res.value && res.value.then) {
@@ -47,7 +46,7 @@ async function loopNext(gen, res = {}) {
 }
 
 
-export async function asyncAction(fn: Function, ...args: Array<any>) {
+export async function asyncAction(this: any, fn: Function, ...args: Array<any>) {
     invariant(isGeneratorFunction(fn), `${fn.name || 'fn'} must be a generator function`);
     const generator = fn.call(this, ...args);
 

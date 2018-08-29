@@ -3,13 +3,11 @@
  * @Author: lijianzhang
  * @Date: 2018-03-31 21:38:41
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-03-31 21:39:47
+ * @Last Modified time: 2018-08-29 23:16:36
  * @flow
  */
 
 import event from './event';
-
-const clone = require('lodash.clone');
 
 export default function useLog() {
     const unAction = event.on('action', (name) => {
@@ -27,9 +25,9 @@ export default function useLog() {
     });
 
     const unSet = event.on('set', ({
-        target, key, oldValue, value,
+        target, key, value,
     }) => {
-        console.log('%c set: %o %c %s %c oldValue %o => %c newValue %o', 'color: #ff4a4e;', target, 'color: #009688;', key, 'color: #263238;', clone(oldValue), 'color: #03A9F4;', clone(value)); //eslint-disable-line
+        console.log('%c set: %o %c %s %c newValue %o', 'color: #ff4a4e;', target, 'color: #009688;', key, 'color: #03A9F4;', value); //eslint-disable-line
     });
 
     return () => {

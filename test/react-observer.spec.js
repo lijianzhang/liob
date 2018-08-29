@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import { mount } from 'enzyme';
-import { reactObserver, observable, action } from '../src';
+import { reactObserver, observable, action } from '../es';
 
 function delay(time, value, shouldThrow = false) {
     return new Promise((resolve, reject) => {

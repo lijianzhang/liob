@@ -1,14 +1,11 @@
 /*
  * @Author: lijianzhang
- * @Date: 2018-03-31 20:30:17
+ * @Date: 2018-08-29 21:36:27
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-03-31 20:31:31
- * @flow
+ * @Last Modified time: 2018-08-29 21:37:18
  */
 
-
 /**
- * 是否是方法
  * @param {any} fn
  */
 export function isFunction(fn: any) {
@@ -36,7 +33,7 @@ export function invariant(cond: boolean, message: string = 'Illegal state') {
 }
 
 export function isObservableObject(obj: any) {
-    // 判断是否非window和DOM对象的对象，
+    // 判断是否否可作为数据源
     if (Array.isArray(obj)) return true;
     if (!obj || obj.toString() !== '[object Object]' || obj.nodeType || obj.setInterval) {
         return false;

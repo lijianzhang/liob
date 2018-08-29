@@ -2,12 +2,14 @@
  * @Author: lijianzhang
  * @Date: 2018-03-31 21:04:00
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-07-19 00:24:03
+ * @Last Modified time: 2018-08-30 00:42:03
  * @flow
  */
-import liob from './liob';
-import { isFunction, isPrimitive, isObservableObject, invariant } from './utils';
+import store from './store';
 import event from './event';
+import { PROXY_KEY, OBSERVER_KEY, RAW_KEY } from './constant';
+import { isFunction, isPrimitive, isObservableObject, invariant } from './utils';
+import { IProxyData, IClass } from './type';
 /**
  * 设计流程:
  * observable 函数传入一个待观察的对象, 对改对象进行Proxy的封装
@@ -17,8 +19,9 @@ import event from './event';
  */
 
 
-function onGet(target, key, receiver) {
-    if (key === '$raw') return target;
+
+function onGet(target: IProxyData, key: string | number | symbol, receiver) {
+    if (typeof key === 'symbol') return target;
     let value = Reflect.get(target, key, receiver);
     if (isFunction(value)) {
         return value;
@@ -28,37 +31,62 @@ function onGet(target, key, receiver) {
         }
     }
 
-    if (liob.currentObserver) {
-        const observers = liob.getObservers(target, key);
-        observers.add(liob.currentObserver);
-        liob.currentObserver.bindObservers.add(observers);
+    if (store.currentObserver) {
+        if (!target[OBSERVER_KEY]) {
+            Object.defineProperty(target, OBSERVER_KEY, {
+                value: new Map(),
+                writable: false,
+                enumerable: false,
+                configurable: false,
+            });
+        }
+
+        let observers = target[OBSERVER_KEY]!.get(key);
+
+        if (!observers) {
+            observers = new Set(); 
+            target[OBSERVER_KEY]!.set(key as string, observers);
+        }
+
+        observers.add(store.currentObserver);
+        store.currentObserver.bindObservers.add(observers);
     }
 
     return value;
 }
 
-function onSet(target, key, value, receiver) {
+function onSet(target: IProxyData, key, value, receiver) {
     const oldValue = Reflect.get(target, key, receiver);
     if (oldValue === value && key !== 'length') return true;
+    event.emit('set', { target, key, oldValue, value });
     Reflect.set(target, key, value, receiver);
-    event.emit('set', {
-        target, key, oldValue, value,
-    });
-    const observers = liob.getObservers(target, key);
-    liob.pushQueue(observers);
+    if (target[OBSERVER_KEY]) {
+
+        const observers = target[OBSERVER_KEY]!.get(key);
+
+        if (observers) {
+            store.pushQueue(observers);
+        }
+    }
     return true;
 }
 
 function onDelete(target, key) {
     const result = Reflect.deleteProperty(target, key);
-    const observers = liob.getObservers(target, key);
-    liob.pushQueue(observers);
+    if (target[OBSERVER_KEY]) {
+        const observers = target[OBSERVER_KEY]!.get(key);
+
+        if (observers) {
+            store.pushQueue(observers);
+        }
+    }
     return result;
 }
 
 export function toObservable(store: {}): {} {
-    if (isPrimitive(store) || liob.isProxy(store)) return store;
-    let proxy = liob.dataToProxy.get(store);
+    if (isPrimitive(store)) return store;
+    let proxy = store[PROXY_KEY];
+
     if (proxy) return proxy;
 
     proxy = new Proxy(store, {
@@ -67,15 +95,25 @@ export function toObservable(store: {}): {} {
         deleteProperty: onDelete,
     });
 
-    liob.dataToProxy.set(store, proxy);
-    liob.proxys.add(proxy);
+
+    Object.defineProperty(store, PROXY_KEY, {
+        value: proxy,
+        writable: false,
+        enumerable: false,
+        configurable: false,
+    });
+
+    Object.defineProperty(store, RAW_KEY, {
+        value: store,
+        writable: false,
+        enumerable: false,
+        configurable: false,
+    });
+
     return proxy;
 }
 
-const $raw = Symbol('$raw');
-
-
-export default function decorativeObservable(target: Function | {}, key: string, descriptor: any) {
+export default function observable<T extends IClass>(target: T  | {}, key: string, descriptor: any) {
     if (key && descriptor) {
         const { value, initializer } = descriptor;
         if (value) {
@@ -93,21 +131,10 @@ export default function decorativeObservable(target: Function | {}, key: string,
         }
         return descriptor;
     } else if (typeof target === 'function') {
-        target[$raw] = target;
-
-        if (target.__proto__[$raw]) { // eslint-disable-line
-            target.__proto__ = target.__proto__[$raw]; // eslint-disable-line
-        }
-
-        const proxy: Proxy<Function> = new Proxy(target, {
+        const proxy = new Proxy(target, {
             construct(Cls, argumentsList) {
                 const ob = new Cls(...argumentsList);
                 const proxy = toObservable(ob);
-                Reflect.defineProperty(ob, '$proxy', {
-                    value: proxy,
-                    writable: false,
-                    enumerable: false,
-                });
                 return proxy;
             },
         });

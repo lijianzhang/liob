@@ -1,11 +1,11 @@
 /*
  * @Author: lijianzhang
- * @Date: 2018-03-31 21:33:47
+ * @Date: 2018-08-29 22:38:06
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-03-31 21:38:32
- * @flow
+ * @Last Modified time: 2018-08-29 23:56:02
  */
-class Event {
+
+export class Event {
     listenerMap: Map<string, Set<Function>> = new Map();
 
     on(type: string, fn: Function) {

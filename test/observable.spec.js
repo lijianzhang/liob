@@ -1,21 +1,13 @@
 /* eslint-disable */
 
-import observable, { toObservable } from '../src/observable';
-import event from '../src/event';
-import liob from '../src/liob';
-import asyncAction from '../src/async-action';
+import { observable, toObservable, event, store, PROXY_KEY, RAW_KEY, asyncAction } from '../es';
 
 
 describe('multiple observable test', () => {
     test('obj and toObservable(obj)should equal', () => {
         const obj = {};
-        expect(toObservable(obj)).toEqual(obj);
-        expect(liob.dataToProxy.has(obj)).toBeTruthy();
-    });
-
-    test('obj and observable(obj)should equal', () => {
-        const obj = {};
-        expect(observable(obj)).toEqual(obj);
+        const proxy = toObservable(obj);
+        expect(proxy[RAW_KEY]).toEqual(obj);
     });
 
     test('observable on set will change', () => {
@@ -24,7 +16,7 @@ describe('multiple observable test', () => {
             count += 1;
         });
 
-        const obj = observable({});
+        const obj = toObservable({});
 
         obj.name = 'liob';
         obj.age = 1;
@@ -43,6 +35,14 @@ describe('multiple observable test', () => {
         
 
         const user = new User();
-        expect(liob.proxys.has(user)).toBeTruthy();
+        let count = 0;
+        const unEvent = event.on('set', () => {
+            count += 1;
+        });
+
+        user.name = 'liob';
+        user.age = 1;
+
+        expect(count).toBe(2);
     });
 });

@@ -2,12 +2,12 @@
  * @Author: lijianzhang
  * @Date: 2017-12-31 00:36:33
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-03-31 21:55:29
+ * @Last Modified time: 2018-08-30 00:02:03
  */
 
 
-import { action, observable } from '../src';
-import { observe } from '../src/observer';
+import { WrapperAction, action, observable } from '../es';
+import { observe } from '../es/observer';
 
 
 describe('multiple action test', () => {
@@ -23,7 +23,7 @@ describe('multiple action test', () => {
             obj.b; //eslint-disable-line
         });
 
-        action(() => {
+        WrapperAction(() => {
             obj.a = 2;
             obj.b = 2;
         })();
@@ -43,11 +43,11 @@ describe('multiple action test', () => {
             obj.b; //eslint-disable-line
         });
 
-        const action2 = action(() => {
+        const action2 = WrapperAction(() => {
             obj.b = 2;
         });
 
-        const action1 = action(() => {
+        const action1 = WrapperAction(() => {
             obj.a = 2;
             action2();
         });

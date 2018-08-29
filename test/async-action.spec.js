@@ -2,12 +2,12 @@
  * @Author: lijianzhang
  * @Date: 2017-12-31 00:36:33
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-03-10 13:57:07
+ * @Last Modified time: 2018-08-29 23:58:39
  */
 
 
-import { asyncAction, action, observable } from '../src';
-import { observe } from '../src/observer';
+import { asyncAction, action, observable } from '../es';
+import { observe } from '../es/observer';
 
 function delay(time, value, shouldThrow = false) {
     return new Promise((resolve, reject) => {

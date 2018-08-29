@@ -1,30 +1,30 @@
+
 /*
  * @Author: lijianzhang
- * @Date: 2018-03-31 20:31:49
+ * @Date: 2018-08-29 22:41:33
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-03-31 21:05:36
- * @flow
+ * @Last Modified time: 2018-08-30 00:16:47
  */
-import liob from './liob';
+import store from "./store";
+
+let id = 0;
 
 export default class Observer {
-    constructor(callBack: Function, name?: string) {
-        /**
-         * 每次依赖被修改的时候都会触发callBack
-         */
-        this.callBack = callBack;
+    constructor(cb: Function, name?: string) {
+        id += 1;
+        this.id = id;
+        this.callback = cb;
         this.name = name;
     }
 
-    callBack: ?Function;
+    name?: string;
 
-    name: ?string;
+    public readonly id: number;
 
-    bindObservers: Set<Set<Observer>> = new Set();
+    private callback: Function | null;
 
-    observers: Set<Observer>;
+    public bindObservers: Set<Set<Observer>> = new Set();
 
-    /** 执行fn并对fn进行依赖收集 */
     collectDep(fn: Function) {
         this.beginCollectDep();
         const res = fn();
@@ -34,12 +34,12 @@ export default class Observer {
 
     beginCollectDep() {
         this.clearBinds();
-        liob.currentObserver = this;
+        store.currentObservers.push(this);
     }
 
     endCollectDep() {
-        const index = liob.collectObservers.indexOf(this);
-        liob.collectObservers.splice(index, 1);
+        const index = store.currentObservers.indexOf(this);
+        store.currentObservers.splice(index, 1);
     }
 
     clearBinds() {
@@ -49,13 +49,13 @@ export default class Observer {
         this.bindObservers.clear();
     }
 
-    run() {
-        if (this.callBack) this.callBack(this);
-    }
-
     unSubscribe() {
         this.clearBinds();
-        this.callBack = null;
+        this.callback = null;
+    }
+
+    public run() {
+        if (this.callback) this.callback(this);
     }
 }
 

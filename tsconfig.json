@@ -1,0 +1,28 @@
+
+{
+    "compilerOptions": {
+      "module": "es2015",
+      "moduleResolution": "node",
+      "newLine": "LF",
+      "outDir": "./es",
+      "target": "es6",
+      "sourceMap": false,
+      "declaration": true,
+      "lib": ["es2017"],
+      "noUnusedLocals": true,
+      "noUnusedParameters": true,
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "noImplicitAny": false,
+      "noImplicitReturns": true,
+      "allowSyntheticDefaultImports": true,
+      "noFallthroughCasesInSwitch": true
+    },
+    "include": [
+      "src/**/*"
+    ],
+    "exclude": [
+      ".git",
+      "node_modules"
+    ]
+  }

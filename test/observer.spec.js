@@ -1,6 +1,5 @@
-import { observable } from '../src';
-import { observe } from '../src/observer';
-import liob from '../src/liob';
+
+import { observe, observable, store } from '../es';
 
 /* eslint-disable no-unused-expressions */
 
@@ -45,18 +44,18 @@ describe('multiple observer test', () => {
         });
     });
 
-    test('liob currentObserver should equal observe', () => {
-        // const user = observable({ name: 'liob', age: 0 });
+    test('store currentObserver should equal observe', () => {
+        // const user = observable({ name: 'store', age: 0 });
         let currentObserver = null;
         const ob = observe(() => {
-            currentObserver = liob.currentObserver; //eslint-disable-line
+            currentObserver = store.currentObserver; //eslint-disable-line
         });
         expect(currentObserver).toEqual(ob);
     });
 
     test('should retrun 3 of observe.bindObservers.size', () => {
-        const user1 = observable({ name: 'liob', age: 0 });
-        const user2 = observable({ name: 'liob2', age: 1 });
+        const user1 = observable({ name: 'store', age: 0 });
+        const user2 = observable({ name: 'store2', age: 1 });
 
         const ob = observe(() => {
             user1.name;
@@ -67,8 +66,8 @@ describe('multiple observer test', () => {
         expect(ob.bindObservers.size).toBe(3);
     });
 
-    test('callBack and bindObservers should be equal to empty when executing unSubscribe', () => {
-        const user = observable({ name: 'liob', age: 0 });
+    test('callback and bindObservers should be equal to empty when executing unSubscribe', () => {
+        const user = observable({ name: 'store', age: 0 });
         const ob = observe(() => {
             user.name; //eslint-disable-line
         });
@@ -76,16 +75,16 @@ describe('multiple observer test', () => {
         expect(ob.bindObservers.size).toEqual(1);
         ob.unSubscribe();
         expect(ob.bindObservers.size).toEqual(0);
-        expect(ob.callBack).toBeNull();
+        expect(ob.callback).toBeNull();
     });
 
-    test('observe need set callBack', () => {
+    test('observe need set callback', () => {
         expect(() => observe()).toThrowError();
     });
 
     test('...', () => {
-        const user1 = observable({ name: 'liob', age: 0 });
-        const user2 = observable({ name: 'liob2', age: 1 });
+        const user1 = observable({ name: 'store', age: 0 });
+        const user2 = observable({ name: 'store2', age: 1 });
 
         let currentObserver1 = null;
         let currentObserver2 = null;
@@ -93,13 +92,13 @@ describe('multiple observer test', () => {
         let ob2 = null;
 
         const ob = observe(() => {
-            currentObserver1 = liob.currentObserver;
+            currentObserver1 = store.currentObserver;
             ob2 = observe(() => {
-                currentObserver2 = liob.currentObserver;
+                currentObserver2 = store.currentObserver;
                 user2.name;
             });
             user1.name;
-            currentObserver3 = liob.currentObserver;
+            currentObserver3 = store.currentObserver;
         });
         expect(currentObserver1).toEqual(ob);
         expect(currentObserver2).toEqual(ob2);
