@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { mount } from 'enzyme';
-import { reactObserver, observable, action, event } from '../src';
+import { reactObserver, observable, action } from '../src';
 
 function delay(time, value: any = 0, shouldThrow = false) {
     return new Promise((resolve, reject) => {
@@ -36,9 +36,6 @@ describe('react-observer', () => {
 
         const app = mount(<App />);
         expect(app.text()).toBe('1');
-        event.on('set', (...args) => {
-            console.log(...args);
-        })
         store.addNum();
         await delay(1000);
 
