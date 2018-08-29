@@ -6,6 +6,7 @@
       "newLine": "LF",
       "outDir": "./es",
       "target": "es6",
+      "jsx": "react",
       "sourceMap": false,
       "declaration": true,
       "lib": ["es2017"],
@@ -19,7 +20,8 @@
       "noFallthroughCasesInSwitch": true
     },
     "include": [
-      "src/**/*"
+      "src/**/*",
+      "test/**/*",
     ],
     "exclude": [
       ".git",

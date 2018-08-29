@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-03-31 21:04:00
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-08-30 00:42:03
+ * @Last Modified time: 2018-08-30 01:44:42
  * @flow
  */
 import store from './store';
@@ -83,7 +83,7 @@ function onDelete(target, key) {
     return result;
 }
 
-export function toObservable(store: {}): {} {
+export function toObservable<T>(store: T): T {
     if (isPrimitive(store)) return store;
     let proxy = store[PROXY_KEY];
 
@@ -113,7 +113,7 @@ export function toObservable(store: {}): {} {
     return proxy;
 }
 
-export default function observable<T extends IClass>(target: T  | {}, key: string, descriptor: any) {
+export default function observable<T>(target: T, key?: string, descriptor?: any): T {
     if (key && descriptor) {
         const { value, initializer } = descriptor;
         if (value) {

@@ -1,5 +1,5 @@
 
-import { observe, observable, store } from '../es';
+import { observe, observable, store } from '../src';
 
 /* eslint-disable no-unused-expressions */
 
@@ -79,7 +79,7 @@ describe('multiple observer test', () => {
     });
 
     test('observe need set callback', () => {
-        expect(() => observe()).toThrowError();
+        expect(() => (observe as any)()).toThrowError();
     });
 
     test('...', () => {

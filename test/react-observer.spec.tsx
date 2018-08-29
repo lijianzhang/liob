@@ -1,10 +1,10 @@
 /* eslint-disable react/no-multi-comp */
 
-import React, { Component } from 'react';
+import * as React from 'react';
 import { mount } from 'enzyme';
-import { reactObserver, observable, action } from '../es';
+import { reactObserver, observable, action, event } from '../src';
 
-function delay(time, value, shouldThrow = false) {
+function delay(time, value: any = 0, shouldThrow = false) {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             if (shouldThrow) reject(value);
@@ -14,6 +14,7 @@ function delay(time, value, shouldThrow = false) {
 }
 
 describe('react-observer', () => {
+
     @observable
     class Store {
             num = 1;
@@ -27,7 +28,7 @@ describe('react-observer', () => {
     test('When the observable data changes, the component will be re-rendered', async () => {
         const store = new Store();
         @reactObserver
-        class App extends Component {
+        class App extends React.Component {
             render() {
                 return <div>{store.num}</div>;
             }
@@ -35,6 +36,9 @@ describe('react-observer', () => {
 
         const app = mount(<App />);
         expect(app.text()).toBe('1');
+        event.on('set', (...args) => {
+            console.log(...args);
+        })
         store.addNum();
         await delay(1000);
 

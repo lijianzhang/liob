@@ -2,17 +2,16 @@
  * @Author: lijianzhang
  * @Date: 2017-12-31 00:36:33
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-08-30 00:02:03
+ * @Last Modified time: 2018-08-30 02:01:17
  */
 
 
-import { WrapperAction, action, observable } from '../es';
-import { observe } from '../es/observer';
+import { WrapperAction, action, observable, toObservable, observe } from '../src';
 
 
 describe('multiple action test', () => {
     test('observe only run one time', () => {
-        const obj = observable({
+        const obj = toObservable({
             a: 1,
             b: 1,
         });
@@ -32,7 +31,7 @@ describe('multiple action test', () => {
     });
 
     test('nested action only run one time observe', () => {
-        const obj = observable({
+        const obj = toObservable({
             a: 1,
             b: 1,
         });
@@ -59,6 +58,7 @@ describe('multiple action test', () => {
 
 
     test('class action function', () => {
+
         @observable
         class User {
             name = 'Dio';

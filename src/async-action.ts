@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-03-31 21:30:17
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-08-29 23:11:59
+ * @Last Modified time: 2018-08-30 01:43:25
  */
 import { runAction } from './action';
 import { invariant } from './utils';
@@ -56,7 +56,7 @@ export async function asyncAction(this: any, fn: Function, ...args: Array<any>) 
 }
 
 
-export default function decorativeAsyncAction(target: Function, key: string, descriptor: any) {
+export default function decorativeAsyncAction(target: any, key?: string, descriptor?: any) {
     if (key && descriptor) {
         const { value, initializer } = descriptor;
         if (value) {

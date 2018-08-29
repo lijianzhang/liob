@@ -26,6 +26,7 @@
     "author": "lijianzhang",
     "license": "MIT",
     "devDependencies": {
+        "@types/jest": "^23.3.1",
         "@types/react": "^16.4.12",
         "enzyme": "^3.3.0",
         "enzyme-adapter-react-16": "^1.1.1",
@@ -35,18 +36,33 @@
         "rollup-plugin-commonjs": "^9.0.0",
         "rollup-plugin-node-resolve": "^3.2.0",
         "rollup-plugin-replace": "^2.0.0",
-        "rollup-plugin-uglify": "^3.0.0",
         "rollup-plugin-typescript": "^0.8.1",
+        "rollup-plugin-uglify": "^3.0.0",
+        "ts-jest": "^23.1.4",
         "tslint": "^5.11.0",
         "typescript": "^3.0.1"
     },
     "jest": {
+        "transform": {
+            "^.+\\.tsx?$": "ts-jest"
+         },
+         "tsConfigFile": "tsconfig.json",
         "collectCoverageFrom": [
+            "src/**/*.ts",
             "src/**/*.js"
         ],
         "setupFiles": [
-            "<rootDir>/test/shim.js",
-            "<rootDir>/test/setup.js"
+            "<rootDir>/test/shim.ts",
+            "<rootDir>/test/setup.ts"
+        ],
+        "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+        "moduleFileExtensions": [
+          "ts",
+          "tsx",
+          "js",
+          "jsx",
+          "json",
+          "node"
         ]
     },
     "dependencies": {

@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-import { observable, toObservable, event, store, PROXY_KEY, RAW_KEY, asyncAction } from '../es';
+import { observable, toObservable, event, RAW_KEY } from '../src';
 
 
 describe('multiple observable test', () => {
@@ -16,7 +16,7 @@ describe('multiple observable test', () => {
             count += 1;
         });
 
-        const obj = toObservable({});
+        const obj = toObservable({name: '', age: 0 });
 
         obj.name = 'liob';
         obj.age = 1;
@@ -44,5 +44,6 @@ describe('multiple observable test', () => {
         user.age = 1;
 
         expect(count).toBe(2);
+        unEvent();
     });
 });

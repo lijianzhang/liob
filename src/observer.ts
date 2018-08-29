@@ -3,7 +3,7 @@
  * @Author: lijianzhang
  * @Date: 2018-08-29 22:41:33
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-08-30 00:16:47
+ * @Last Modified time: 2018-08-30 01:45:07
  */
 import store from "./store";
 
@@ -21,7 +21,7 @@ export default class Observer {
 
     public readonly id: number;
 
-    private callback: Function | null;
+    public callback: Function | null;
 
     public bindObservers: Set<Set<Observer>> = new Set();
 
