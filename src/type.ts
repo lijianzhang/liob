@@ -12,7 +12,7 @@ export interface IProxyData {
 
 export interface IClass {
     new(...args: any[]): {};
-    __proto__: any;
+    __proto__?: any;
 }
 
 

@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-03-31 21:04:00
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-08-30 01:44:42
+ * @Last Modified time: 2018-08-30 02:07:32
  * @flow
  */
 import store from './store';
@@ -113,7 +113,7 @@ export function toObservable<T>(store: T): T {
     return proxy;
 }
 
-export default function observable<T>(target: T, key?: string, descriptor?: any): T {
+export default function observable<T>(target: T | (T & IClass), key?: string, descriptor?: any): T {
     if (key && descriptor) {
         const { value, initializer } = descriptor;
         if (value) {
