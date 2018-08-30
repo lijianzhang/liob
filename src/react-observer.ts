@@ -11,7 +11,6 @@ import Observer from './observer';
 import { OBSERVER_COMPONENT_KEY } from './constant';
 
 const baseRenderKey = Symbol('baseRender');
-const isReCollectDepsKey = Symbol('isReCollectDeps');
 const connectKey = Symbol('connect');
 const $componentWillMount = Symbol('componentWillMount');
 
@@ -26,8 +25,7 @@ function reactiveRender(this: React.Component) {
 
 function initRender(this: React.Component) {
     this[OBSERVER_COMPONENT_KEY] = new Observer(() => {
-        if (!this[isReCollectDepsKey] && this[$componentWillMount]) {
-            this[isReCollectDepsKey] = true;
+        if (this[$componentWillMount]) {
             this.forceUpdate();
         }
     }, `${this.constructor.name}.render()`);

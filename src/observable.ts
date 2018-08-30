@@ -21,9 +21,9 @@ import { IProxyData, IClass } from './type';
 
 
 function onGet(target: IProxyData, key: string | number | symbol, receiver) {
-    if (typeof key === 'symbol') return target;
+    if (key === RAW_KEY) return target;
     let value = Reflect.get(target, key, receiver);
-    if (isFunction(value)) {
+    if (isFunction(value) || (typeof key === 'symbol')) {
         return value;
     } else if (typeof value === 'object') {
         if (isObservableObject(value)) {
@@ -95,20 +95,21 @@ export function toObservable<T>(store: T): T {
         deleteProperty: onDelete,
     });
 
+    if (!store[PROXY_KEY]) {
+        Object.defineProperty(store, PROXY_KEY, {
+            value: proxy,
+            writable: false,
+            enumerable: false,
+        });
+    }
 
-    Object.defineProperty(store, PROXY_KEY, {
-        value: proxy,
-        writable: false,
-        enumerable: false,
-        configurable: false,
-    });
-
-    Object.defineProperty(store, RAW_KEY, {
-        value: store,
-        writable: false,
-        enumerable: false,
-        configurable: false,
-    });
+    if (!store[RAW_KEY]) {
+        Object.defineProperty(store, RAW_KEY, {
+            value: store,
+            writable: false,
+            enumerable: false,
+        });
+    }
 
     return proxy;
 }
