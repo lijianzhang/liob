@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-03-31 21:04:00
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-08-30 02:07:32
+ * @Last Modified time: 2018-08-30 15:14:33
  * @flow
  */
 import store from './store';
@@ -21,7 +21,6 @@ import { IProxyData, IClass } from './type';
 
 
 function onGet(target: IProxyData, key: string | number | symbol, receiver) {
-    if (key === RAW_KEY) return target;
     let value = Reflect.get(target, key, receiver);
     if (isFunction(value) || (typeof key === 'symbol')) {
         return value;
@@ -132,6 +131,12 @@ export default function observable<T>(target: T | (T & IClass), key?: string, de
         }
         return descriptor;
     } else if (typeof target === 'function') {
+
+        target[RAW_KEY] = target;  // fix extends class error
+        if (target.__proto__[RAW_KEY]) {
+            target.__proto__ = target.__proto__[RAW_KEY];
+        }
+
         const proxy = new Proxy(target, {
             construct(Cls, argumentsList) {
                 const ob = new Cls(...argumentsList);
