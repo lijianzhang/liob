@@ -24,12 +24,8 @@ function onGet(target: IProxyData, key: string | number | symbol, receiver) {
     let value = Reflect.get(target, key, receiver);
     if (isFunction(value) || (typeof key === 'symbol')) {
         return value;
-    } else if (typeof value === 'object') {
-        if (Reflect.has(target, PROXY_KEY)) {
-            value = Reflect.get(target, PROXY_KEY);
-        } else if (isObservableObject(value)) {
-            value = toObservable(value); //eslint-disable-line
-        }
+    } else if (isObservableObject(value)) {
+        value = toObservable(value);
     }
 
     if (store.currentObserver) {
@@ -86,8 +82,10 @@ function onDelete(target, key) {
 
 export function toObservable<T>(store: T): T {
     if (isPrimitive(store)) return store;
+    let proxy = store[PROXY_KEY];
+    if (proxy) return proxy;
 
-    const proxy = new Proxy(store, {
+    proxy = new Proxy(store, {
         get: onGet,
         set: onSet,
         deleteProperty: onDelete,
