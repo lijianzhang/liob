@@ -28,7 +28,7 @@ export default class Observer {
     private _change = true;
 
     public get change() {
-        return this.change;
+        return this._change;
     }
 
     collectDep(fn: Function) {
