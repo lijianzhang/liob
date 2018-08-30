@@ -10,7 +10,7 @@ import store from './store';
 import { IProxyData, IClass } from './type';
 import { RAW_KEY } from './constant';
 
-export default function computed(target: IClass, key: string, descriptor: any) {
+export default function computed(target: any, key: string, descriptor: any) {
     const computedKey = Symbol(key);
 
     const newGet = descriptor.get;

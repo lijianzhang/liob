@@ -5,15 +5,20 @@
  * @Last Modified time: 2018-08-29 23:50:29
  * @flow
  */
-import React from 'react';
+import * as React from 'react';
+import { SFC } from 'react';
 import Observer from './observer';
-import { ObserverSFC } from './type';
 import { OBSERVER_COMPONENT_KEY } from './constant';
 
 const baseRenderKey = Symbol('baseRender');
 const isReCollectDepsKey = Symbol('isReCollectDeps');
 const connectKey = Symbol('connect');
 const $componentWillMount = Symbol('componentWillMount');
+
+type IReactComponent<P = any> =
+    | React.StatelessComponent<P>
+    | React.ComponentClass<P>
+    | React.ClassicComponentClass<P>;
 
 function reactiveRender(this: React.Component) {
     return this[OBSERVER_COMPONENT_KEY].collectDep(this[baseRenderKey]);
@@ -64,12 +69,13 @@ function patch(target, funcName, runMixinFirst = false) {
 }
 
 
-function createObserverComponent(component: ObserverSFC) {
-    return class extends React.PureComponent {
-        static displayName = component.displayName || component.name
-        static propTypes = component.propTypes
-        static contextTypes = component.contextTypes
-        static defaultProps = component.defaultProps
+function createObserverComponent(component: IReactComponent) {
+    return class extends React.Component {
+        static displayName = component.displayName || component.name;
+        static propTypes = component.propTypes;
+        static contextTypes = component.contextTypes;
+        static defaultProps = component.defaultProps;
+
         render() {
             return component.call(this, this.props, this.context);
         }
@@ -77,19 +83,27 @@ function createObserverComponent(component: ObserverSFC) {
 }
 
 
-export default function ReactObserver<T extends typeof React.Component | React.StatelessComponent>(target: T) {
-    if (typeof target === 'function' && !target.prototype) return ReactObserver(createObserverComponent(target as React.StatelessComponent));
+export default function ReactObserver<T extends IReactComponent>(target: T | SFC): T {
+    if (target[connectKey]) return (target as T);
+    if ( typeof target === "function" && (target.prototype && target.prototype.render) ) {
+        target[connectKey] = true;
+        patch(target.prototype, 'componentWillMount', true);
+        patch(target.prototype, 'componentWillUnmount');
+        return (target as T);
+    }
 
-    if (target[connectKey]) return target;
-    target[connectKey] = true;
-    patch(target.prototype, 'componentWillMount', true);
-    patch(target.prototype, 'componentWillUnmount');
-    return target;
+    return ReactObserver(createObserverComponent(target as IReactComponent)) as any;
+    
 }
 
-export function ObserverComponent({ children, render }) {
-    let Component = children || render;
+interface Props {
+    children?: SFC | React.Factory<any> ;
+    render?: SFC;
+}
+
+export function ObserverComponent(target: Props) {
+
+    let Component = target.children || target.render;
     if (!Component) return null;
-    Component = ReactObserver(Component);
-    return React.createElement(Component);
+    return React.createElement(ReactObserver(Component));
 }
