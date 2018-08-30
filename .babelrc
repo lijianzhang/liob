@@ -9,29 +9,26 @@
                 },
                 "include": ["transform-es2015-classes"]
             }
-        ],
-        "stage-0",
-        "flow"
+        ]
     ],
-    "plugins": ["transform-decorators-legacy", ["transform-runtime", {
-      "helpers": false,
-      "polyfill": false,
-      "regenerator": true,
-      "moduleName": "babel-runtime"
-    }]],
     "env": {
         "test": {
-            "presets": [["env", {
-                "targets": {"node": "current"},
-                "include": ["transform-es2015-classes"]
-            }], "stage-0", "react"],
-            "plugins": ["transform-decorators-legacy"]
+            "presets": [
+                ["env", {
+                    "targets": {
+                        "node": "current"
+                    },
+                    "include": ["transform-es2015-classes"]
+                }], "stage-0", "react"
+            ]
         },
         "commonjs": {
             "plugins": [
                 "istanbul",
-                ["transform-es2015-modules-commonjs", { "loose": true }]
-              ]
+                ["transform-es2015-modules-commonjs", {
+                    "loose": true
+                }]
+            ]
         }
     }
 }

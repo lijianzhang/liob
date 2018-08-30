@@ -1,13 +1,15 @@
 import nodeResolve from 'rollup-plugin-node-resolve';
-import babel from 'rollup-plugin-babel';
+import typescript from 'typescript';
+// import babel from 'rollup-plugin-babel';
 import replace from 'rollup-plugin-replace';
 import commonjs from 'rollup-plugin-commonjs';
 import uglify from 'rollup-plugin-uglify';
+import rollupTypescript from 'rollup-plugin-typescript';
 
 const env = process.env.NODE_ENV;
 
 const config = {
-    input: 'src/index.js',
+    input: 'src/index.ts',
     external: ['react'],
     output: {
         format: 'umd',
@@ -18,9 +20,10 @@ const config = {
     },
     plugins: [
         nodeResolve(),
-        babel({
-            exclude: '**/node_modules/**',
-        }),
+        // babel({
+        //     exclude: '**/node_modules/**',
+        // }),
+        rollupTypescript({ typescript, importHelpers: true }),
         replace({
             'process.env.NODE_ENV': JSON.stringify(env),
         }),
