@@ -25,6 +25,8 @@ export default class Observer {
 
     public bindObservers: Set<Set<Observer>> = new Set();
 
+    private depChanged = true;
+
     collectDep(fn: Function) {
         this.beginCollectDep();
         const res = fn();
@@ -33,15 +35,19 @@ export default class Observer {
     }
 
     beginCollectDep() {
-        this.clearBinds();
-        store.currentObservers.push(this);
+        if (this.depChanged) {
+            this.clearBinds();
+            store.currentObservers.push(this);
+        }
     }
 
     endCollectDep() {
-        const index = store.currentObservers.indexOf(this);
-        store.currentObservers.splice(index, 1);
+        if (this.depChanged) {
+            const index = store.currentObservers.indexOf(this);
+            store.currentObservers.splice(index, 1);
+        }
+        this.depChanged = false;
     }
-
     clearBinds() {
         this.bindObservers.forEach((observers) => {
             observers.delete(this);
@@ -55,6 +61,7 @@ export default class Observer {
     }
 
     public run() {
+        this.depChanged = true;
         if (this.callback) this.callback(this);
     }
 }

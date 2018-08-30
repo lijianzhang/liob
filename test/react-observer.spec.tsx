@@ -28,6 +28,7 @@ describe('react-observer', () => {
     test('When the observable data changes, the component will be re-rendered', async () => {
         const store = new Store();
         @reactObserver
+        @reactObserver
         class App extends React.Component {
             render() {
                 return <div>{store.num}</div>;
@@ -64,7 +65,7 @@ describe('react-observer', () => {
             }
         }
 
-        function App3() {
+        function App2() {
             return <div>{store.num}</div>;
         }
 
@@ -77,20 +78,26 @@ describe('react-observer', () => {
 
 
         const app1 = mount(<App1 />);
+        expect(app.text()).toBe('2');
         expect(app1.text()).toBe('2');
         store.addNum();
         await delay(100);
 
+        expect(app.text()).toBe('3');
         expect(app1.text()).toBe('3');
 
-        const ObserverApp3 = reactObserver(App3);
+        const ObserverApp2 = reactObserver(App2);
 
-        const app3 = mount(<ObserverApp3 />);
-        expect(app3.text()).toBe('3');
+        const app2 = mount(<ObserverApp2 />);
+        expect(app.text()).toBe('3');
+        expect(app1.text()).toBe('3');
+        expect(app2.text()).toBe('3');
         store.addNum();
         await delay(100);
 
-        expect(app3.text()).toBe('4');
+        expect(app.text()).toBe('4');
+        expect(app1.text()).toBe('4');
+        expect(app2.text()).toBe('4');
 
         await delay(100);
     })

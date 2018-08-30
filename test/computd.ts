@@ -28,5 +28,8 @@ describe('computed test', () => {
         store.number;
         expect(i).toEqual(1);
         expect(store.number).toEqual(1);
+        store.num += 1;
+        expect(store.number).toEqual(2);
+        expect(i).toEqual(2);
     });
 });
