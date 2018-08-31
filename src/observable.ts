@@ -5,10 +5,11 @@
  * @Last Modified time: 2018-08-30 15:14:33
  * @flow
  */
+import "reflect-metadata";
 import store from './store';
 import event from './event';
 import { PROXY_KEY, OBSERVER_KEY, RAW_KEY } from './constant';
-import { isFunction, isPrimitive, isObservableObject, invariant } from './utils';
+import { isFunction, isPrimitive, isObservableObject } from './utils';
 import { IProxyData, IClass } from './type';
 /**
  * 设计流程:
@@ -18,15 +19,12 @@ import { IProxyData, IClass } from './type';
  *
  */
 
-
-
 function onGet(target: IProxyData, key: string | number | symbol, receiver) {
     let value = Reflect.get(target, key, receiver);
-    if (isFunction(value) || (typeof key === 'symbol')) {
+    if (isFunction(value) || key === RAW_KEY || key === PROXY_KEY) {
         return value;
     } else if (isObservableObject(value)) {
-        const descriptor = Object.getOwnPropertyDescriptor(target, key);
-        if (descriptor && !descriptor.get) {
+        if (!isPrimitive(store)) {
             value = toObservable(value);
         }
     }
@@ -84,11 +82,16 @@ function onDelete(target, key) {
 }
 
 export function toObservable<T>(store: T): T {
-    if (isPrimitive(store)) return store;
     let proxy = store[PROXY_KEY];
     if (proxy) return proxy;
 
-    proxy = new Proxy(store, {
+    proxy = toProxy(store);
+
+    return proxy;
+}
+
+function toProxy<T>(store: T) {
+    const proxy = new Proxy(store, {
         get: onGet,
         set: onSet,
         deleteProperty: onDelete,
@@ -109,27 +112,26 @@ export function toObservable<T>(store: T): T {
         enumerable: false,
     });
 
-
     return proxy;
+
 }
 
-export default function observable<T>(target: T | (T & IClass), key?: string, descriptor?: any): T {
-    if (key && descriptor) {
-        const { value, initializer } = descriptor;
-        if (value) {
-            invariant(typeof value === 'object', 'observable must a object');
-            descriptor.value = function wrapAction(...args) {
-                return toObservable.call(this, value, ...args);
-            };
-        } else if (initializer) {
-            descriptor.value = function wrapAction(...args) {
-                const value = initializer();
-                invariant(typeof value === 'object', 'observable must a object');
-                return toObservable.call(this, value, ...args);
-            };
-            delete descriptor.initializer;
-        }
-        return descriptor;
+export default function observable<T>(target: T | (T & IClass) | object, key?: string): any {
+    if (key) {
+        const observableKey = Symbol('liob_' + key);
+        (observableKey as any).type == 'attr';
+
+        Object.defineProperty(target as object, key, {
+            get: function() { 
+                const value = onGet(this, observableKey, undefined);
+                return value;
+            },
+            set: function(value) {
+                onSet(this, observableKey, value, this);
+            },
+            enumerable: true,
+        });
+        return undefined;
     } else if (typeof target === 'function') {
 
         target[RAW_KEY] = target;  // fix extends class error

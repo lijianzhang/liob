@@ -17,6 +17,7 @@ describe('react-observer', () => {
 
     @observable
     class Store {
+
             num = 1;
 
             @action
@@ -28,7 +29,6 @@ describe('react-observer', () => {
     test('When the observable data changes, the component will be re-rendered', async () => {
         const store = new Store();
         @reactObserver
-        @reactObserver
         class App extends React.Component {
             render() {
                 return <div>{store.num}</div>;
@@ -38,11 +38,8 @@ describe('react-observer', () => {
         const app = mount(<App />);
         expect(app.text()).toBe('1');
         store.addNum();
-        await delay(1000);
-
+        await delay(1);
         expect(app.text()).toBe('2');
-
-        await delay(1000);
     });
 
 
