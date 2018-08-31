@@ -25,7 +25,10 @@ function onGet(target: IProxyData, key: string | number | symbol, receiver) {
     if (isFunction(value) || (typeof key === 'symbol')) {
         return value;
     } else if (isObservableObject(value)) {
-        value = toObservable(value);
+        const descriptor = Object.getOwnPropertyDescriptor(target, key);
+        if (descriptor && !descriptor.get) {
+            value = toObservable(value);
+        }
     }
 
     if (store.currentObserver) {

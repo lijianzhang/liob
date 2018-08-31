@@ -72,7 +72,7 @@ describe('react-observer', () => {
         const app = mount(<App />);
         expect(app.text()).toBe('1');
         store.addNum();
-        await delay(100);
+        await delay(1);
 
         expect(app.text()).toBe('2');
 
@@ -81,7 +81,7 @@ describe('react-observer', () => {
         expect(app.text()).toBe('2');
         expect(app1.text()).toBe('2');
         store.addNum();
-        await delay(100);
+        await delay(1);
 
         expect(app.text()).toBe('3');
         expect(app1.text()).toBe('3');
@@ -93,12 +93,12 @@ describe('react-observer', () => {
         expect(app1.text()).toBe('3');
         expect(app2.text()).toBe('3');
         store.addNum();
-        await delay(100);
+        await delay(1);
 
         expect(app.text()).toBe('4');
         expect(app1.text()).toBe('4');
         expect(app2.text()).toBe('4');
 
-        await delay(100);
+        await delay(1);
     })
 });
