@@ -2,7 +2,7 @@
  * @Author: lijianzhang
  * @Date: 2018-03-31 21:04:00
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-08-30 15:14:33
+ * @Last Modified time: 2018-09-01 01:29:10
  * @flow
  */
 import "reflect-metadata";
@@ -11,6 +11,7 @@ import event from './event';
 import { PROXY_KEY, OBSERVER_KEY, RAW_KEY } from './constant';
 import { isFunction, isPrimitive, isObservableObject } from './utils';
 import { IProxyData, IClass } from './type';
+import Observer from "./observer";
 /**
  * 设计流程:
  * observable 函数传入一个待观察的对象, 对改对象进行Proxy的封装
@@ -21,11 +22,18 @@ import { IProxyData, IClass } from './type';
 
 function onGet(target: IProxyData, key: string | number | symbol, receiver) {
     let value = Reflect.get(target, key, receiver);
-    if (isFunction(value) || key === RAW_KEY || key === PROXY_KEY) {
+    if (isFunction(value) || key === RAW_KEY || key === PROXY_KEY ||  value instanceof Observer) {
         return value;
-    } else if (isObservableObject(value)) {
-        if (!isPrimitive(store)) {
-            value = toObservable(value);
+    }
+
+    if (!isPrimitive(value)) {
+        if(value[PROXY_KEY]) {
+            value = value[PROXY_KEY];
+        } else {
+            const descriptor = Object.getOwnPropertyDescriptor(target, key);
+            if (descriptor && !descriptor.get && isObservableObject(value)) {
+                value = toObservable(value);
+            }
         }
     }
 
@@ -81,22 +89,14 @@ function onDelete(target, key) {
     return result;
 }
 
-export function toObservable<T>(store: T): T {
-    let proxy = store[PROXY_KEY];
-    if (proxy) return proxy;
 
-    proxy = toProxy(store);
 
-    return proxy;
-}
-
-function toProxy<T>(store: T) {
+export function toObservable<T>(store: T) {
     const proxy = new Proxy(store, {
         get: onGet,
         set: onSet,
         deleteProperty: onDelete,
     });
-
 
     Object.defineProperty(store, PROXY_KEY, {
         value: proxy,
