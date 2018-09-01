@@ -2,14 +2,14 @@
  * @Author: lijianzhang
  * @Date: 2018-03-31 21:04:00
  * @Last Modified by: lijianzhang
- * @Last Modified time: 2018-09-01 01:29:10
+ * @Last Modified time: 2018-09-02 02:10:08
  * @flow
  */
 import "reflect-metadata";
 import store from './store';
 import event from './event';
-import { PROXY_KEY, OBSERVER_KEY, RAW_KEY } from './constant';
-import { isFunction, isPrimitive, isObservableObject } from './utils';
+import { PROXY_KEY, OBSERVER_KEY, RAW_KEY, DO_NOT_TRUN_INTO_A_PRXOY } from './constant';
+import { isFunction, isPrimitive, isObservableObject, invariant } from './utils';
 import { IProxyData, IClass } from './type';
 import Observer from "./observer";
 /**
@@ -26,7 +26,7 @@ function onGet(target: IProxyData, key: string | number | symbol, receiver) {
         return value;
     }
 
-    if (!isPrimitive(value)) {
+    if (!isPrimitive(value) && Reflect.get(target, DO_NOT_TRUN_INTO_A_PRXOY)) {
         if(value[PROXY_KEY]) {
             value = value[PROXY_KEY];
         } else {
@@ -120,7 +120,7 @@ export default function observable<T>(target: T | (T & IClass) | object, key?: s
     if (key) {
         const observableKey = Symbol('liob_' + key);
         (observableKey as any).type == 'attr';
-
+        Reflect.set(target as object, DO_NOT_TRUN_INTO_A_PRXOY, true);
         Object.defineProperty(target as object, key, {
             get: function() { 
                 const value = onGet(this, observableKey, undefined);
@@ -133,7 +133,7 @@ export default function observable<T>(target: T | (T & IClass) | object, key?: s
         });
         return undefined;
     } else if (typeof target === 'function') {
-
+        invariant(Reflect.get(target, DO_NOT_TRUN_INTO_A_PRXOY) === undefined, '该类已经设置了局部的observable, 所以该类生成的对象无法转为observable');
         target[RAW_KEY] = target;  // fix extends class error
         if (target.__proto__[RAW_KEY]) {
             target.__proto__ = target.__proto__[RAW_KEY];
