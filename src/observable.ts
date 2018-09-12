@@ -26,7 +26,7 @@ function onGet(target: IProxyData, key: string | number | symbol, receiver) {
         return value;
     }
 
-    if (!isPrimitive(value) && !Reflect.get(target, DO_NOT_TRUN_INTO_A_PRXOY)) {
+    if (!isPrimitive(value) && !Reflect.get(value, DO_NOT_TRUN_INTO_A_PRXOY)) {
         if(value[PROXY_KEY]) {
             value = value[PROXY_KEY];
         } else {
