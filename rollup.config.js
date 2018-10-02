@@ -1,10 +1,11 @@
 import nodeResolve from 'rollup-plugin-node-resolve';
-import typescript from 'typescript';
 // import babel from 'rollup-plugin-babel';
 import replace from 'rollup-plugin-replace';
 import commonjs from 'rollup-plugin-commonjs';
 import uglify from 'rollup-plugin-uglify';
-import rollupTypescript from 'rollup-plugin-typescript';
+import typescript from 'rollup-plugin-typescript2';
+
+const override = { compilerOptions: { declaration: false, target: 'es6' } }
 
 const env = process.env.NODE_ENV;
 
@@ -20,10 +21,7 @@ const config = {
     },
     plugins: [
         nodeResolve(),
-        // babel({
-        //     exclude: '**/node_modules/**',
-        // }),
-        rollupTypescript({ typescript, importHelpers: true }),
+        typescript({ tsconfig: 'tsconfig.json', tsconfigOverride: override,  }),
         replace({
             'process.env.NODE_ENV': JSON.stringify(env),
         }),
