@@ -8,10 +8,9 @@
 import "reflect-metadata";
 import store from './store';
 import event from './event';
-import { PROXY_KEY, OBSERVER_KEY, RAW_KEY, DO_NOT_TRUN_INTO_A_PRXOY } from './constant';
-import { isFunction, isPrimitive, isObservableObject, invariant } from './utils';
+import { OBSERVER_KEY, RAW_KEY, DO_NOT_TRUN_INTO_A_PRXOY } from './constant';
+import { isFunction, isObservableObject } from './utils';
 import { IProxyData, IClass } from './type';
-import Observer from "./observer";
 /**
  * 设计流程:
  * observable 函数传入一个待观察的对象, 对改对象进行Proxy的封装
@@ -22,18 +21,14 @@ import Observer from "./observer";
 
 function onGet(target: IProxyData, key: string | number | symbol, receiver) {
     let value = Reflect.get(target, key, receiver);
-    if (isFunction(value) || key === RAW_KEY || key === PROXY_KEY ||  value instanceof Observer) {
+    if (isFunction(value) || key === RAW_KEY) {
         return value;
     }
 
-    if (!isPrimitive(value) && !Reflect.get(value, DO_NOT_TRUN_INTO_A_PRXOY)) {
-        if(value[PROXY_KEY]) {
-            value = value[PROXY_KEY];
-        } else {
-            const descriptor = Object.getOwnPropertyDescriptor(target, key);
-            if (descriptor && !descriptor.get && isObservableObject(value)) {
-                value = toObservable(value);
-            }
+    if (isObservableObject(value) && !Reflect.get(value, DO_NOT_TRUN_INTO_A_PRXOY) && !value[RAW_KEY]) {
+        const descriptor = Object.getOwnPropertyDescriptor(target, key);
+        if (descriptor && !descriptor.get) {
+            value = toObservable(value);
         }
     }
 
@@ -54,7 +49,7 @@ function onGet(target: IProxyData, key: string | number | symbol, receiver) {
             target[OBSERVER_KEY]!.set(key as string, observers);
         }
 
-        observers.add(store.currentObserver);
+        observers.add(store.currentObserver.id);
         store.currentObserver.bindObservers.add(observers);
     }
 
@@ -98,13 +93,6 @@ export function toObservable<T>(store: T) {
         deleteProperty: onDelete,
     });
 
-    Object.defineProperty(store, PROXY_KEY, {
-        value: proxy,
-        writable: false,
-        enumerable: false,
-    });
-
-
 
     Object.defineProperty(store, RAW_KEY, {
         value: store,
@@ -117,10 +105,10 @@ export function toObservable<T>(store: T) {
 }
 
 export default function observable<T>(target: T | (T & IClass) | object, key?: string): any {
+
     if (key) {
         const observableKey = Symbol('liob_' + key);
         (observableKey as any).type == 'attr';
-        Reflect.set(target as object, DO_NOT_TRUN_INTO_A_PRXOY, true);
         Object.defineProperty(target as object, key, {
             get: function() { 
                 const value = onGet(this, observableKey, undefined);
@@ -131,9 +119,9 @@ export default function observable<T>(target: T | (T & IClass) | object, key?: s
             },
             enumerable: true,
         });
+
         return undefined;
     } else if (typeof target === 'function') {
-        invariant(Reflect.get(target, DO_NOT_TRUN_INTO_A_PRXOY) === undefined, '该类已经设置了局部的observable, 所以该类生成的对象无法转为observable');
         target[RAW_KEY] = target;  // fix extends class error
         if (target.__proto__[RAW_KEY]) {
             target.__proto__ = target.__proto__[RAW_KEY];

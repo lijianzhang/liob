@@ -15,6 +15,7 @@ export default class Observer {
         this.id = id;
         this.callback = cb;
         this.name = name;
+        store.observers.set(this.id, this);
     }
 
     name?: string;
@@ -23,7 +24,7 @@ export default class Observer {
 
     public callback: Function | null;
 
-    public bindObservers: Set<Set<Observer>> = new Set();
+    public bindObservers: Set<Set<number>> = new Set();
 
     private _change = true;
 
@@ -54,7 +55,7 @@ export default class Observer {
     }
     clearBinds() {
         this.bindObservers.forEach((observers) => {
-            observers.delete(this);
+            observers.delete(this.id);
         });
         this.bindObservers.clear();
     }

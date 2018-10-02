@@ -9,7 +9,7 @@ import useLog from './log';
 
 export class Store {
 
-    queue: Set<Observer> = new Set();
+    queue: Set<number> = new Set();
 
     onError(error) {
         throw error;
@@ -30,7 +30,9 @@ export class Store {
 
     unLog?: Function;
 
-    currentObservers: Observer[] = [];
+    public observers: Map<number, Observer> = new Map();
+
+    public currentObservers: Observer[] = [];
 
     get currentObserver() {
         if (this.currentObservers.length === 0) return null;
@@ -39,8 +41,8 @@ export class Store {
 
     private readyToRun: boolean = false;
 
-    pushQueue(observers: Set<Observer>) {
-        observers.forEach(observer => this.queue.add(observer));
+    pushQueue(ids: Set<number>) {
+        ids.forEach(id => this.queue.add(id));
 
         if (!this.inAction && !this.readyToRun) {
             Promise.resolve().then(this.runQueue);
@@ -51,7 +53,7 @@ export class Store {
     runQueue = () => {
         this.readyToRun = false;
         if (this.queue.size === 0) return;
-        this.queue.forEach(observer => observer.run());
+        this.queue.forEach(id => this.observers.get(id).run());
         this.queue.clear();
     };
   

@@ -4,7 +4,7 @@ import Observer from './observer';
 
 export interface IProxyData {
     [PROXY_KEY]?: ProxyConstructor;
-    [OBSERVER_KEY]?: Map<string | number | symbol, Set<Observer>>;
+    [OBSERVER_KEY]?: Map<string | number | symbol, Set<number>>;
     [RAW_KEY]: {} | any[];
     [s: string]: any;
     [n: number]: any;
